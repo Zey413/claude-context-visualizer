@@ -739,13 +739,25 @@ body {
   background: var(--slider-color);
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 0 10px color-mix(in srgb, var(--slider-color) 40%, transparent);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+@supports (box-shadow: 0 0 10px color-mix(in srgb, red 40%, transparent)) {
+  .token-slider::-webkit-slider-thumb {
+    box-shadow: 0 0 10px color-mix(in srgb, var(--slider-color) 40%, transparent);
+  }
 }
 
 .token-slider::-webkit-slider-thumb:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 16px color-mix(in srgb, var(--slider-color) 60%, transparent);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.6);
+}
+
+@supports (box-shadow: 0 0 16px color-mix(in srgb, red 60%, transparent)) {
+  .token-slider::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 16px color-mix(in srgb, var(--slider-color) 60%, transparent);
+  }
 }
 
 .token-slider::-moz-range-thumb {
@@ -755,7 +767,13 @@ body {
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 0 10px color-mix(in srgb, var(--slider-color) 40%, transparent);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+}
+
+@supports (box-shadow: 0 0 10px color-mix(in srgb, red 40%, transparent)) {
+  .token-slider::-moz-range-thumb {
+    box-shadow: 0 0 10px color-mix(in srgb, var(--slider-color) 40%, transparent);
+  }
 }
 
 /* --- Token Number Input --- */
@@ -2299,11 +2317,21 @@ body {
 
 /* Focus ring for range slider thumb */
 .token-slider:focus-visible::-webkit-slider-thumb {
-  box-shadow: 0 0 0 3px var(--accent-purple), 0 0 10px color-mix(in srgb, var(--slider-color) 40%, transparent);
+  box-shadow: 0 0 0 3px var(--accent-purple), 0 0 10px rgba(139, 92, 246, 0.4);
 }
 
 .token-slider:focus-visible::-moz-range-thumb {
-  box-shadow: 0 0 0 3px var(--accent-purple), 0 0 10px color-mix(in srgb, var(--slider-color) 40%, transparent);
+  box-shadow: 0 0 0 3px var(--accent-purple), 0 0 10px rgba(139, 92, 246, 0.4);
+}
+
+@supports (box-shadow: 0 0 10px color-mix(in srgb, red 40%, transparent)) {
+  .token-slider:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px var(--accent-purple), 0 0 10px color-mix(in srgb, var(--slider-color) 40%, transparent);
+  }
+  .token-slider:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px var(--accent-purple), 0 0 10px color-mix(in srgb, var(--slider-color) 40%, transparent);
+  }
+}
 }
 
 /* Gauge segment focus for keyboard navigation */
