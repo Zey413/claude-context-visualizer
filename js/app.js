@@ -50,6 +50,68 @@
   let _estimatorInited = false;
   let _analyticsInited = false;
   let _apiParserInited = false;
+  let _replayInited = false;
+
+  // ---- Conversation Replay Scenarios ----
+  const REPLAY_SCENARIOS = [
+    {
+      id: 'simple-qa',
+      name: 'Simple Q&A',
+      description: '10 turns of short questions and answers',
+      systemTokens: 500,
+      turns: [
+        { user: 800,  assistant: 1200, tools: 0 },
+        { user: 400,  assistant: 1500, tools: 0 },
+        { user: 600,  assistant: 1100, tools: 0 },
+        { user: 350,  assistant: 900,  tools: 0 },
+        { user: 500,  assistant: 1300, tools: 0 },
+        { user: 450,  assistant: 1000, tools: 0 },
+        { user: 700,  assistant: 1400, tools: 0 },
+        { user: 300,  assistant: 800,  tools: 0 },
+        { user: 550,  assistant: 1200, tools: 0 },
+        { user: 400,  assistant: 1100, tools: 0 },
+      ]
+    },
+    {
+      id: 'code-assistant',
+      name: 'Code Assistant',
+      description: '8 turns with tool calls for code editing',
+      systemTokens: 1200,
+      turns: [
+        { user: 1500, assistant: 2000, tools: 800 },
+        { user: 600,  assistant: 3500, tools: 1200 },
+        { user: 900,  assistant: 2800, tools: 1500 },
+        { user: 400,  assistant: 4000, tools: 2000 },
+        { user: 1200, assistant: 3000, tools: 1800 },
+        { user: 500,  assistant: 3500, tools: 2200 },
+        { user: 800,  assistant: 2500, tools: 1000 },
+        { user: 350,  assistant: 4500, tools: 2500 },
+      ]
+    },
+    {
+      id: 'document-analysis',
+      name: 'Document Analysis',
+      description: '5 turns with a large document and deep analysis',
+      systemTokens: 3000,
+      turns: [
+        { user: 25000, assistant: 3000, tools: 0 },
+        { user: 2000,  assistant: 5000, tools: 0 },
+        { user: 1500,  assistant: 8000, tools: 0 },
+        { user: 800,   assistant: 6000, tools: 500 },
+        { user: 1200,  assistant: 7000, tools: 0 },
+      ]
+    },
+  ];
+
+  // Replay state
+  let _replayState = {
+    scenarioIndex: 0,
+    currentTurn: 0,        // 0 = not started, 1+ = turn in progress
+    currentHalf: 'user',   // 'user' or 'assistant' within a turn
+    playing: false,
+    timerId: null,
+    cumulativeTokens: { system: 0, user: 0, assistant: 0, tools: 0 },
+  };
 
   // ---- Smooth Number Counter Animation ----
   const _activeAnimations = {};
@@ -1114,6 +1176,149 @@
     }
   }
 
+  // ---- Model Cost Comparison ----
+  let _pricingInited = false;
+
+  function initPricing() {
+    const toggle = document.getElementById('pricing-toggle');
+    const card = document.getElementById('pricing-card');
+    if (!toggle || !card) return;
+
+    toggle.addEventListener('click', () => {
+      const isOpen = card.classList.toggle('pricing-card--open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+      if (isOpen && !_pricingInited) {
+        _pricingInited = true;
+        updatePricingTable();
+      }
+    });
+  }
+
+  /**
+   * Calculate input/output/total cost for a given model using current token allocations.
+   */
+  function calcModelCost(tokens, model) {
+    var inputTokens = ['system', 'user', 'tools'].reduce(function (s, c) { return s + tokens[c]; }, 0);
+    var outputTokens = tokens.assistant;
+    var inputCost = (inputTokens / 1000000) * model.pricing.inputPerMTok;
+    var outputCost = (outputTokens / 1000000) * model.pricing.outputPerMTok;
+    return { inputCost: inputCost, outputCost: outputCost, totalCost: inputCost + outputCost };
+  }
+
+  /**
+   * Update the pricing comparison table with costs for all models based on current slider values.
+   */
+  function updatePricingTable() {
+    if (!_pricingInited) return;
+
+    var tbody = document.getElementById('pricing-tbody');
+    var recEl = document.getElementById('pricing-recommendation');
+    if (!tbody) return;
+
+    var currentModelIndex = state.modelIndex;
+    var total = categories.reduce(function (s, c) { return s + state.tokens[c]; }, 0);
+
+    // Calculate costs for all models
+    var rows = CLAUDE_MODELS.map(function (model, idx) {
+      var costs = calcModelCost(state.tokens, model);
+      return {
+        index: idx,
+        name: model.name,
+        inputCost: costs.inputCost,
+        outputCost: costs.outputCost,
+        totalCost: costs.totalCost
+      };
+    });
+
+    // Find most expensive and cheapest
+    var maxCost = 0;
+    var minCost = Infinity;
+    var cheapestIdx = 0;
+    rows.forEach(function (r) {
+      if (r.totalCost > maxCost) maxCost = r.totalCost;
+      if (r.totalCost < minCost) { minCost = r.totalCost; cheapestIdx = r.index; }
+    });
+
+    // If all costs are zero (no tokens), treat uniformly
+    var allZero = total === 0;
+
+    tbody.innerHTML = '';
+
+    rows.forEach(function (r) {
+      var tr = document.createElement('tr');
+      tr.className = 'pricing-tr';
+
+      var isActive = r.index === currentModelIndex;
+      var isCheapest = r.index === cheapestIdx && !allZero;
+      var isExpensive = maxCost > 0 && r.totalCost === maxCost && !allZero;
+
+      if (isActive) tr.classList.add('pricing-tr--active');
+      if (isCheapest) tr.classList.add('pricing-tr--cheapest');
+
+      // Model name cell
+      var tdModel = document.createElement('td');
+      tdModel.className = 'pricing-td pricing-td--model';
+      var nameStr = '';
+      if (isActive) nameStr += '<span class="pricing-active-dot"></span>';
+      nameStr += r.name.replace(/\s*\(\d+K?\)/, ''); // strip context size for brevity
+      if (isCheapest) nameStr += '<span class="pricing-cheapest-badge">Best</span>';
+      tdModel.innerHTML = nameStr;
+      tr.appendChild(tdModel);
+
+      // Input cost
+      var tdInput = document.createElement('td');
+      tdInput.className = 'pricing-td pricing-td--num';
+      tdInput.textContent = '$' + r.inputCost.toFixed(3);
+      tr.appendChild(tdInput);
+
+      // Output cost
+      var tdOutput = document.createElement('td');
+      tdOutput.className = 'pricing-td pricing-td--num';
+      tdOutput.textContent = '$' + r.outputCost.toFixed(3);
+      tr.appendChild(tdOutput);
+
+      // Total cost
+      var tdTotal = document.createElement('td');
+      tdTotal.className = 'pricing-td pricing-td--num pricing-td--total';
+      tdTotal.textContent = '$' + r.totalCost.toFixed(3);
+      tr.appendChild(tdTotal);
+
+      // Savings
+      var tdSavings = document.createElement('td');
+      tdSavings.className = 'pricing-td pricing-td--num pricing-td--savings';
+      if (allZero || isExpensive || maxCost === 0) {
+        tdSavings.innerHTML = '<span class="pricing-savings--none">\u2014</span>';
+      } else {
+        var savingsPct = Math.round((1 - r.totalCost / maxCost) * 100);
+        tdSavings.innerHTML = '<span class="pricing-savings--positive">' + savingsPct + '%&nbsp;\u2193</span>';
+      }
+      tr.appendChild(tdSavings);
+
+      tbody.appendChild(tr);
+    });
+
+    // Recommendation line
+    if (recEl) {
+      if (allZero) {
+        recEl.textContent = '';
+      } else {
+        var cheapestModel = CLAUDE_MODELS[cheapestIdx];
+        var cheapestName = cheapestModel.name.replace(/\s*\(\d+K?\)/, '');
+        var savingsVsMax = maxCost > 0 ? Math.round((1 - minCost / maxCost) * 100) : 0;
+        if (savingsVsMax > 0 && cheapestIdx !== currentModelIndex) {
+          recEl.innerHTML = '<strong>Best value:</strong> ' + cheapestName +
+            ' saves ' + savingsVsMax + '% vs most expensive with the same context';
+        } else if (cheapestIdx === currentModelIndex && savingsVsMax > 0) {
+          recEl.innerHTML = '<strong>Great choice!</strong> ' + cheapestName +
+            ' is already the most cost-effective option (' + savingsVsMax + '% savings)';
+        } else {
+          recEl.textContent = '';
+        }
+      }
+    }
+  }
+
   // ---- Token Estimator ----
   const ESTIMATOR_CHIPS = [
     { label: '1 page of code',    tokens: 400,  category: 'user' },
@@ -1569,6 +1774,267 @@
     }
   }
 
+  // ---- Conversation Replay ----
+  function initReplay() {
+    const toggle = document.getElementById('replay-toggle');
+    const card = document.getElementById('replay-card');
+
+    if (!toggle || !card) return;
+
+    toggle.addEventListener('click', () => {
+      const isOpen = card.classList.toggle('replay-card--open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+      if (isOpen && !_replayInited) {
+        _replayInited = true;
+        _initReplayBody();
+      }
+    });
+  }
+
+  function _initReplayBody() {
+    const scenarioSelect = document.getElementById('replay-scenario-select');
+    const playBtn = document.getElementById('replay-play-btn');
+    const pauseBtn = document.getElementById('replay-pause-btn');
+    const resetBtn = document.getElementById('replay-reset-btn');
+
+    // Populate scenario dropdown
+    REPLAY_SCENARIOS.forEach((scenario, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = scenario.name + ' (' + scenario.turns.length + ' turns)';
+      scenarioSelect.appendChild(opt);
+    });
+
+    scenarioSelect.addEventListener('change', () => {
+      _replayState.scenarioIndex = parseInt(scenarioSelect.value);
+      replayReset();
+    });
+
+    playBtn.addEventListener('click', replayPlay);
+    pauseBtn.addEventListener('click', replayPause);
+    resetBtn.addEventListener('click', replayReset);
+  }
+
+  function replayPlay() {
+    if (_replayState.playing) return;
+
+    const scenario = REPLAY_SCENARIOS[_replayState.scenarioIndex];
+    if (!scenario) return;
+
+    // If replay is complete, reset first
+    if (_replayState.currentTurn > scenario.turns.length) {
+      replayReset();
+    }
+
+    _replayState.playing = true;
+
+    const playBtn = document.getElementById('replay-play-btn');
+    const pauseBtn = document.getElementById('replay-pause-btn');
+    playBtn.style.display = 'none';
+    pauseBtn.style.display = '';
+
+    // If starting from scratch, apply system tokens first
+    if (_replayState.currentTurn === 0) {
+      _replayState.cumulativeTokens = { system: 0, user: 0, assistant: 0, tools: 0 };
+      _replayState.cumulativeTokens.system = scenario.systemTokens;
+      _replayState.currentTurn = 1;
+      _replayState.currentHalf = 'user';
+
+      // Clear the log
+      const log = document.getElementById('replay-log');
+      log.innerHTML = '';
+
+      // Add system prompt entry
+      replayAddLogEntry('system', 'System prompt loaded', scenario.systemTokens);
+      replayApplyToGauge();
+    }
+
+    // Start the turn-by-turn timer (each half-turn = 500ms, so 1 full turn = 1s)
+    replayScheduleNext();
+  }
+
+  function replayPause() {
+    _replayState.playing = false;
+    if (_replayState.timerId) {
+      clearTimeout(_replayState.timerId);
+      _replayState.timerId = null;
+    }
+
+    const playBtn = document.getElementById('replay-play-btn');
+    const pauseBtn = document.getElementById('replay-pause-btn');
+    playBtn.style.display = '';
+    pauseBtn.style.display = 'none';
+  }
+
+  function replayReset() {
+    replayPause();
+
+    _replayState.currentTurn = 0;
+    _replayState.currentHalf = 'user';
+    _replayState.cumulativeTokens = { system: 0, user: 0, assistant: 0, tools: 0 };
+
+    // Reset progress bar
+    const progressFill = document.getElementById('replay-progress-fill');
+    const progressLabel = document.getElementById('replay-progress-label');
+    const scenario = REPLAY_SCENARIOS[_replayState.scenarioIndex];
+    if (progressFill) progressFill.style.width = '0%';
+    if (progressLabel) progressLabel.textContent = 'Turn 0 / ' + (scenario ? scenario.turns.length : 0);
+
+    // Clear log
+    const log = document.getElementById('replay-log');
+    if (log) log.innerHTML = '<div class="replay-log__empty">Select a scenario and press Play</div>';
+
+    // Reset gauge to zero
+    categories.forEach(cat => { state.tokens[cat] = 0; });
+    syncSlidersFromState();
+    render();
+  }
+
+  function replayScheduleNext() {
+    if (!_replayState.playing) return;
+
+    const scenario = REPLAY_SCENARIOS[_replayState.scenarioIndex];
+    if (!scenario) return;
+
+    const turnIndex = _replayState.currentTurn - 1; // 0-based index
+
+    if (turnIndex >= scenario.turns.length) {
+      // Replay complete
+      replayPause();
+      replayAddLogEntry('system', 'Replay complete!', 0);
+      return;
+    }
+
+    _replayState.timerId = setTimeout(() => {
+      replayAdvance();
+    }, 500);
+  }
+
+  function replayAdvance() {
+    if (!_replayState.playing) return;
+
+    const scenario = REPLAY_SCENARIOS[_replayState.scenarioIndex];
+    const turnIndex = _replayState.currentTurn - 1;
+    const turn = scenario.turns[turnIndex];
+
+    if (_replayState.currentHalf === 'user') {
+      // Add user tokens
+      _replayState.cumulativeTokens.user += turn.user;
+      replayAddLogEntry('user', 'Turn ' + _replayState.currentTurn + ': User sends message', turn.user);
+      _replayState.currentHalf = 'assistant';
+
+      replayApplyToGauge();
+      replayUpdateProgress();
+      replayScheduleNext();
+
+    } else {
+      // Add assistant (+ tools) tokens
+      _replayState.cumulativeTokens.assistant += turn.assistant;
+      if (turn.tools > 0) {
+        _replayState.cumulativeTokens.tools += turn.tools;
+      }
+
+      const toolsNote = turn.tools > 0
+        ? ' (incl. +' + formatNumber(turn.tools) + ' tool tokens)'
+        : '';
+      replayAddLogEntry('assistant', 'Turn ' + _replayState.currentTurn + ': Assistant responds' + toolsNote, turn.assistant);
+
+      if (turn.tools > 0) {
+        replayAddLogEntry('tools', 'Turn ' + _replayState.currentTurn + ': Tool calls executed', turn.tools);
+      }
+
+      // Move to next turn
+      _replayState.currentTurn++;
+      _replayState.currentHalf = 'user';
+
+      replayApplyToGauge();
+      replayUpdateProgress();
+      replayScheduleNext();
+    }
+  }
+
+  function replayApplyToGauge() {
+    const model = CLAUDE_MODELS[state.modelIndex];
+    const cumulative = _replayState.cumulativeTokens;
+
+    // Clamp to context window
+    let total = categories.reduce((s, c) => s + cumulative[c], 0);
+    if (total > model.contextWindow && total > 0) {
+      const scale = model.contextWindow / total;
+      categories.forEach(cat => {
+        state.tokens[cat] = Math.round(cumulative[cat] * scale);
+      });
+    } else {
+      categories.forEach(cat => {
+        state.tokens[cat] = cumulative[cat];
+      });
+    }
+
+    state.activePreset = null;
+    syncSlidersFromState();
+    render();
+  }
+
+  function replayUpdateProgress() {
+    const scenario = REPLAY_SCENARIOS[_replayState.scenarioIndex];
+    if (!scenario) return;
+
+    const totalTurns = scenario.turns.length;
+    // currentTurn is 1-based and points to next turn after assistant phase, so completed = currentTurn - 1
+    // But we show progress based on half-turns for smooth feel
+    const completedTurns = _replayState.currentHalf === 'user'
+      ? _replayState.currentTurn - 1
+      : _replayState.currentTurn - 0.5;
+    const displayTurn = Math.min(Math.ceil(completedTurns), totalTurns);
+
+    const progressPct = totalTurns > 0 ? (completedTurns / totalTurns) * 100 : 0;
+
+    const progressFill = document.getElementById('replay-progress-fill');
+    const progressLabel = document.getElementById('replay-progress-label');
+
+    if (progressFill) progressFill.style.width = Math.min(progressPct, 100) + '%';
+    if (progressLabel) progressLabel.textContent = 'Turn ' + displayTurn + ' / ' + totalTurns;
+  }
+
+  function replayAddLogEntry(type, text, tokens) {
+    const log = document.getElementById('replay-log');
+    if (!log) return;
+
+    // Remove empty placeholder
+    const empty = log.querySelector('.replay-log__empty');
+    if (empty) empty.remove();
+
+    const icons = { system: '⚙️', user: '👤', assistant: '🤖', tools: '🔧' };
+
+    const entry = document.createElement('div');
+    entry.className = 'replay-log__entry replay-log__entry--' + type;
+
+    const icon = document.createElement('span');
+    icon.className = 'replay-log__icon';
+    icon.textContent = icons[type] || '';
+    icon.setAttribute('aria-hidden', 'true');
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'replay-log__text';
+    textSpan.textContent = text;
+
+    entry.appendChild(icon);
+    entry.appendChild(textSpan);
+
+    if (tokens > 0) {
+      const tokensSpan = document.createElement('span');
+      tokensSpan.className = 'replay-log__tokens';
+      tokensSpan.textContent = '+' + formatNumber(tokens);
+      entry.appendChild(tokensSpan);
+    }
+
+    log.appendChild(entry);
+
+    // Auto-scroll to bottom
+    log.scrollTop = log.scrollHeight;
+  }
+
   // ---- Boot ----
   function init() {
     initModelSelect();
@@ -1579,6 +2045,7 @@
     initEstimator();
     initAnalytics();
     initApiParser();
+    initReplay();
     initTheme();
     initColorCycling();
     initLangSelector();

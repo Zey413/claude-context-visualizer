@@ -329,6 +329,38 @@
       </div>
     </section>
 
+    <!-- Model Cost Comparison -->
+    <section class="pricing-card glass-card" id="pricing-card">
+      <button class="estimator-toggle" id="pricing-toggle" aria-expanded="false" aria-controls="pricing-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">💰</span>
+          <h3 class="estimator-toggle__title">Model Cost Comparison</h3>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="pricing-body" id="pricing-body">
+        <div class="pricing-table-wrap">
+          <table class="pricing-table" id="pricing-table" aria-label="Model pricing comparison">
+            <thead>
+              <tr>
+                <th class="pricing-th pricing-th--model">Model</th>
+                <th class="pricing-th pricing-th--num">Input</th>
+                <th class="pricing-th pricing-th--num">Output</th>
+                <th class="pricing-th pricing-th--num">Total</th>
+                <th class="pricing-th pricing-th--num">Savings</th>
+              </tr>
+            </thead>
+            <tbody id="pricing-tbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+        <div class="pricing-recommendation" id="pricing-recommendation" aria-live="polite"></div>
+      </div>
+    </section>
+
     <!-- Usage Timeline -->
     <section class="timeline-section glass-card" id="timeline-section" aria-label="Usage timeline">
       <div class="timeline-header">
@@ -501,6 +533,70 @@
           <div class="api-parser-turns__detail" id="turns-detail">
             Based on avg. message size
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Conversation Replay -->
+    <section class="replay-card glass-card" id="replay-card">
+      <button class="estimator-toggle" id="replay-toggle" aria-expanded="false" aria-controls="replay-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">🔄</span>
+          <h3 class="estimator-toggle__title">Conversation Replay</h3>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="replay-body" id="replay-body">
+        <p class="replay-desc">Watch how a typical Claude conversation fills up the context window turn by turn.</p>
+
+        <!-- Scenario Selector -->
+        <div class="replay-scenario-row">
+          <label class="replay-scenario-label" for="replay-scenario-select">Scenario</label>
+          <div class="select-wrapper replay-select-wrapper">
+            <select id="replay-scenario-select" class="model-select replay-scenario-select" aria-label="Select replay scenario">
+              <!-- Populated by JS -->
+            </select>
+            <span class="select-arrow" aria-hidden="true">▾</span>
+          </div>
+        </div>
+
+        <!-- Play / Pause / Reset Controls -->
+        <div class="replay-controls">
+          <button class="api-parser-btn api-parser-btn--simulate" id="replay-play-btn" title="Play replay">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Play
+          </button>
+          <button class="api-parser-btn api-parser-btn--stop" id="replay-pause-btn" style="display:none;" title="Pause replay">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="6" y="4" width="4" height="16"/>
+              <rect x="14" y="4" width="4" height="16"/>
+            </svg>
+            Pause
+          </button>
+          <button class="api-parser-btn api-parser-btn--clear" id="replay-reset-btn" title="Reset replay">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+            Reset
+          </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="replay-progress" id="replay-progress">
+          <div class="replay-progress__bar">
+            <div class="replay-progress__fill" id="replay-progress-fill"></div>
+          </div>
+          <div class="replay-progress__label" id="replay-progress-label">Turn 0 / 0</div>
+        </div>
+
+        <!-- Turn-by-turn Log -->
+        <div class="replay-log" id="replay-log" aria-live="polite" aria-label="Replay turn log">
+          <div class="replay-log__empty">Select a scenario and press Play</div>
         </div>
       </div>
     </section>
