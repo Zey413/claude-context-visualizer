@@ -1175,6 +1175,11 @@
 
     // Update conversation turns estimate
     updateConversationTurns();
+
+    // Update dashboard if visible
+    if (typeof Dashboard !== 'undefined' && Dashboard.isVisible()) {
+      Dashboard.update(state);
+    }
   }
 
   // ---- Keyboard Shortcuts ----
@@ -1193,6 +1198,8 @@
         save();
       } else if (e.key === 't' || e.key === 'T') {
         toggleTheme();
+      } else if (e.key === 'd' || e.key === 'D') {
+        if (typeof Dashboard !== 'undefined') Dashboard.toggle(state);
       }
     });
   }
@@ -2723,6 +2730,17 @@
     log.scrollTop = log.scrollHeight;
   }
 
+  // ---- Dashboard ----
+  function initDashboard() {
+    var btn = document.getElementById('dashboard-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      if (typeof Dashboard !== 'undefined') {
+        Dashboard.toggle(state);
+      }
+    });
+  }
+
   // ---- Boot ----
   function init() {
     initModelSelect();
@@ -2730,6 +2748,7 @@
     initSliders();
     initKeyboard();
     initCompareMode();
+    initDashboard();
     initEstimator();
     initAnalytics();
     initPricing();

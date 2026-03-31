@@ -76,6 +76,15 @@
           </svg>
           <span>Compare</span>
         </button>
+        <button id="dashboard-toggle" class="dashboard-btn" title="All-model comparison dashboard" aria-label="Dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <span>Dashboard</span>
+        </button>
         <div class="select-wrapper">
           <select id="model-select" class="model-select" aria-label="Select Claude model">
             <!-- Populated by JS -->
@@ -317,6 +326,211 @@
             <div class="estimator-chips-label">Quick Estimates</div>
             <div class="estimator-chips" id="estimator-chips" role="group" aria-label="Quick token estimates">
               <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+        <!-- Prompt Templates -->
+        <div class="templates-card glass-card" id="templates-card">
+          <button class="estimator-toggle" id="templates-toggle" aria-expanded="false" aria-controls="templates-body">
+            <div class="estimator-toggle__left">
+              <span class="estimator-toggle__icon" aria-hidden="true">📋</span>
+              <h3 class="estimator-toggle__title">Prompt Templates</h3>
+            </div>
+            <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="templates-body" id="templates-body">
+            <p class="templates-desc">Real-world system prompt examples with approximate token counts. Apply one to see how much context it consumes.</p>
+            <div class="templates-grid" id="templates-grid" role="group" aria-label="Prompt templates">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Context Budget Planner -->
+        <div class="planner-card glass-card" id="planner-card">
+          <button class="estimator-toggle" id="planner-toggle" aria-expanded="false" aria-controls="planner-body">
+            <div class="estimator-toggle__left">
+              <span class="estimator-toggle__icon" aria-hidden="true">🧮</span>
+              <h3 class="estimator-toggle__title">Context Budget Planner</h3>
+            </div>
+            <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="planner-body" id="planner-body">
+            <p class="planner-desc">Answer a few questions and we'll recommend the best model and token allocation for your use case.</p>
+
+            <!-- Q1: Use Case -->
+            <fieldset class="planner-question" id="planner-q1">
+              <legend class="planner-question__legend">What's your primary use case?</legend>
+              <label class="planner-option">
+                <input type="radio" name="planner-usecase" value="simple-chat" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">💬</span>
+                  <span class="planner-option__text">Simple chat</span>
+                  <span class="planner-option__hint">Low system prompt</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-usecase" value="code-assist" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">💻</span>
+                  <span class="planner-option__text">Code assistance</span>
+                  <span class="planner-option__hint">Medium system prompt + tools</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-usecase" value="doc-analysis" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">📄</span>
+                  <span class="planner-option__text">Document analysis</span>
+                  <span class="planner-option__hint">Large user input</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-usecase" value="agentic" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">🤖</span>
+                  <span class="planner-option__text">Agentic tasks</span>
+                  <span class="planner-option__hint">Heavy tool use</span>
+                </span>
+              </label>
+            </fieldset>
+
+            <!-- Q2: Conversation Length -->
+            <fieldset class="planner-question" id="planner-q2">
+              <legend class="planner-question__legend">How long are your conversations?</legend>
+              <label class="planner-option">
+                <input type="radio" name="planner-length" value="short" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">⚡</span>
+                  <span class="planner-option__text">Short</span>
+                  <span class="planner-option__hint">1-5 turns</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-length" value="medium" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">💬</span>
+                  <span class="planner-option__text">Medium</span>
+                  <span class="planner-option__hint">5-15 turns</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-length" value="long" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">📜</span>
+                  <span class="planner-option__text">Long</span>
+                  <span class="planner-option__hint">15-30 turns</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-length" value="very-long" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">🔥</span>
+                  <span class="planner-option__text">Very long</span>
+                  <span class="planner-option__hint">30+ turns</span>
+                </span>
+              </label>
+            </fieldset>
+
+            <!-- Q3: Tools -->
+            <fieldset class="planner-question" id="planner-q3">
+              <legend class="planner-question__legend">Do you use tools?</legend>
+              <label class="planner-option">
+                <input type="radio" name="planner-tools" value="none" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">🚫</span>
+                  <span class="planner-option__text">No tools</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-tools" value="light" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">🔧</span>
+                  <span class="planner-option__text">Light tool use</span>
+                  <span class="planner-option__hint">1-3 tools</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-tools" value="heavy" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">🛠️</span>
+                  <span class="planner-option__text">Heavy tool use</span>
+                  <span class="planner-option__hint">5+ tools</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-tools" value="agentic" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">⚙️</span>
+                  <span class="planner-option__text">Agentic</span>
+                  <span class="planner-option__hint">10+ tools, many calls</span>
+                </span>
+              </label>
+            </fieldset>
+
+            <!-- Q4: Budget Priority -->
+            <fieldset class="planner-question" id="planner-q4">
+              <legend class="planner-question__legend">What's your budget priority?</legend>
+              <label class="planner-option">
+                <input type="radio" name="planner-budget" value="cheapest" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">💰</span>
+                  <span class="planner-option__text">Cheapest possible</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-budget" value="balanced" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">⚖️</span>
+                  <span class="planner-option__text">Balance cost &amp; capability</span>
+                </span>
+              </label>
+              <label class="planner-option">
+                <input type="radio" name="planner-budget" value="max" class="planner-radio">
+                <span class="planner-option__box">
+                  <span class="planner-option__icon">🚀</span>
+                  <span class="planner-option__text">Maximum capability</span>
+                </span>
+              </label>
+            </fieldset>
+
+            <!-- Recommendation Result -->
+            <div class="planner-result" id="planner-result" style="display:none;">
+              <div class="planner-result__title">Recommended Configuration</div>
+              <div class="planner-result__model" id="planner-rec-model"></div>
+              <div class="planner-result__grid">
+                <div class="planner-result__alloc">
+                  <span class="planner-result__dot" style="background:#8B5CF6"></span>
+                  <span class="planner-result__label">System</span>
+                  <span class="planner-result__value" id="planner-rec-system">0</span>
+                </div>
+                <div class="planner-result__alloc">
+                  <span class="planner-result__dot" style="background:#3B82F6"></span>
+                  <span class="planner-result__label">User</span>
+                  <span class="planner-result__value" id="planner-rec-user">0</span>
+                </div>
+                <div class="planner-result__alloc">
+                  <span class="planner-result__dot" style="background:#10B981"></span>
+                  <span class="planner-result__label">Assistant</span>
+                  <span class="planner-result__value" id="planner-rec-assistant">0</span>
+                </div>
+                <div class="planner-result__alloc">
+                  <span class="planner-result__dot" style="background:#F59E0B"></span>
+                  <span class="planner-result__label">Tools</span>
+                  <span class="planner-result__value" id="planner-rec-tools">0</span>
+                </div>
+              </div>
+              <div class="planner-result__summary" id="planner-rec-summary"></div>
+              <button class="planner-apply-btn" id="planner-apply-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Apply Recommendation
+              </button>
             </div>
           </div>
         </div>
@@ -635,6 +849,7 @@
   <script src="js/gauge.js"></script>
   <script src="js/particles.js"></script>
   <script src="js/share.js"></script>
+  <script src="js/dashboard.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

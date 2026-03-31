@@ -8,6 +8,7 @@ const ASSETS = [
   './js/gauge.js',
   './js/particles.js',
   './js/share.js',
+  './js/dashboard.js',
   './js/app.js',
   './assets/favicon.svg',
   './manifest.json',
