@@ -17,6 +17,7 @@ const ASSETS = [
   './js/cache-viz.js',
   './js/cost-forecast.js',
   './js/scroll-fx.js',
+  './js/data-generator.js',
   './js/realtime-monitor.js',
   './js/alert-timeline.js',
   './js/token-waterfall.js',
