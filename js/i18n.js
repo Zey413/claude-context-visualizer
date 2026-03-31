@@ -81,6 +81,17 @@ const I18n = (function () {
 
       // Language selector
       language: 'Language',
+
+      // v2.0 — New features
+      dashboard: 'Dashboard',
+      advancedCharts: 'Advanced Charts',
+      chartPie: 'Pie',
+      chartRadar: 'Radar',
+      chartTrend: 'Trend',
+      tokenFlowStream: 'Token Flow Stream',
+      claudeCodeMemory: 'Claude Code Memory',
+      sessionSimulator: 'Session Simulator',
+      footerDashboard: 'Dashboard',
     },
 
     'zh-CN': {
@@ -154,6 +165,17 @@ const I18n = (function () {
 
       // Language selector
       language: '\u8BED\u8A00',
+
+      // v2.0 — New features
+      dashboard: '\u4EEA\u8868\u76D8',
+      advancedCharts: '\u9AD8\u7EA7\u56FE\u8868',
+      chartPie: '\u997C\u56FE',
+      chartRadar: '\u96F7\u8FBE\u56FE',
+      chartTrend: '\u8D8B\u52BF',
+      tokenFlowStream: '\u4EE4\u724C\u6D41',
+      claudeCodeMemory: 'Claude Code \u5185\u5B58',
+      sessionSimulator: '\u4F1A\u8BDD\u6A21\u62DF\u5668',
+      footerDashboard: '\u4EEA\u8868\u76D8',
     },
 
     ja: {
@@ -227,6 +249,17 @@ const I18n = (function () {
 
       // Language selector
       language: '\u8A00\u8A9E',
+
+      // v2.0 — New features
+      dashboard: '\u30C0\u30C3\u30B7\u30E5\u30DC\u30FC\u30C9',
+      advancedCharts: '\u9AD8\u5EA6\u306A\u30C1\u30E3\u30FC\u30C8',
+      chartPie: '\u5186\u30B0\u30E9\u30D5',
+      chartRadar: '\u30EC\u30FC\u30C0\u30FC',
+      chartTrend: '\u30C8\u30EC\u30F3\u30C9',
+      tokenFlowStream: '\u30C8\u30FC\u30AF\u30F3\u30D5\u30ED\u30FC',
+      claudeCodeMemory: 'Claude Code \u30E1\u30E2\u30EA',
+      sessionSimulator: '\u30BB\u30C3\u30B7\u30E7\u30F3\u30B7\u30DF\u30E5\u30EC\u30FC\u30BF',
+      footerDashboard: '\u30C0\u30C3\u30B7\u30E5\u30DC\u30FC\u30C9',
     },
   };
 
@@ -438,7 +471,8 @@ const I18n = (function () {
     if (footerHint) {
       footerHint.innerHTML = t('footerKeyboard') + ' <kbd>R</kbd> ' + t('footerReset') +
         ' &middot; <kbd>1</kbd>-<kbd>4</kbd> ' + t('footerPresets') +
-        ' &middot; <kbd>C</kbd> ' + t('footerCompare');
+        ' &middot; <kbd>C</kbd> ' + t('footerCompare') +
+        ' &middot; <kbd>D</kbd> ' + t('footerDashboard');
     }
 
     // Action bar buttons

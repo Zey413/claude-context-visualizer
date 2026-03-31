@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-03-31
+
+### Added
+- **Updated model lineup**: 8 Claude models (Opus 4, Sonnet 4, Opus 4.5, Sonnet 4.5, Sonnet 4.5 1M, 3.5 Sonnet, 3.5 Haiku, 3 Opus) with current pricing
+- **All-Model Comparison Dashboard**: fullscreen overlay showing every model side-by-side with proportional context bars, tier badges, and cost comparison
+- **Advanced Charts module**: pure SVG charts (Pie, Radar, Trend Line) with animated transitions and responsive design
+- **Claude Code Memory Tracker**: visualizes Claude Code's internal context allocation (System Prompt 4200, MEMORY.md 680, Environment 280, MCP Tools 120 = 5280 tokens fixed overhead)
+- **Session Simulator**: 3 interactive scenarios (Quick Fix, Feature Build, Codebase Exploration) with step-by-step animated replay
+- **Token Flow Stream**: canvas-based animated particle visualization showing tokens flowing toward the context window, color-coded by category
+- **Dashboard keyboard shortcut** (D) and header toggle button
+- **Model tier badges**: flagship, balanced, speed, legacy, extended
+- **localStorage migration**: v1 model indices automatically mapped to v2 model array
+- **MODEL_DATA_VERSION**: versioned state schema with automatic migration on load
+
+### Changed
+- Model data updated from 5 outdated models to 8 current Claude models
+- Budget planner model indices updated for new array layout
+- Service worker cache bumped to v8 with all new JS modules
+- Footer keyboard hint now includes Dashboard shortcut
+- i18n translations updated with keys for all new features (EN, ZH-CN, JA)
+- Manifest description updated for v2.0
+
+### Performance
+- New modules use same lazy initialization pattern as v1 (panels only init on first open)
+- Charts use pure SVG (no canvas overhead) with efficient DOM updates
+- Dashboard overlay uses backdrop-filter for native GPU-accelerated blur
+- Token stream pauses animation loop when collapsed
+
 ## [1.0.0] - 2026-03-31
 
 ### Added
@@ -56,4 +84,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stray closing brace in CSS removed
 - Null check in gauge `setSegmentColors` and PNG export canvas context
 
+[2.0.0]: https://github.com/Zey413/claude-context-visualizer/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/Zey413/claude-context-visualizer/releases/tag/v1.0.0
