@@ -1268,6 +1268,8 @@
         toggleTheme();
       } else if (e.key === 'd' || e.key === 'D') {
         if (typeof Dashboard !== 'undefined') Dashboard.toggle(state);
+      } else if (e.key === '?') {
+        if (typeof KeyboardHelp !== 'undefined') KeyboardHelp.toggle();
       }
     });
   }
@@ -3013,6 +3015,17 @@
     initNewModuleToggle('template-builder');
     if (typeof TemplateBuilder !== 'undefined') {
       TemplateBuilder.init('template-builder-container');
+    }
+
+    // ---- v3.4: Initialize Token Calculator ----
+    initNewModuleToggle('token-calculator');
+    if (typeof TokenCalculator !== 'undefined') {
+      TokenCalculator.init('token-calculator-container');
+    }
+
+    // ---- v3.4: Initialize Keyboard Help ----
+    if (typeof KeyboardHelp !== 'undefined') {
+      // KeyboardHelp auto-binds ? key — no container needed
     }
   }
 

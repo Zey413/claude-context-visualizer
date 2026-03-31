@@ -5695,6 +5695,13 @@ button:focus-visible, select:focus-visible, input:focus-visible {
 .template-builder-section--open .estimator-toggle__chevron { transform: rotate(180deg); }
 
 /* =========================================
+   Token Calculator Section
+   ========================================= */
+.token-calculator-section { contain: layout; }
+.token-calculator-section--open .token-calculator-body { display: block !important; }
+.token-calculator-section--open .estimator-toggle__chevron { transform: rotate(180deg); }
+
+/* =========================================
    Mobile & Touch Optimizations
    ========================================= */
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ctx-viz-v14';
+const CACHE_NAME = 'ctx-viz-v15';
 const ASSETS = [
   './',
   './index.html',
@@ -28,6 +28,8 @@ const ASSETS = [
   './js/guided-tour.js',
   './js/conversation-analyzer.js',
   './js/template-builder.js',
+  './js/keyboard-help.js',
+  './js/token-calculator.js',
   './js/app.js',
   './assets/favicon.svg',
   './manifest.json',
@@ -44,7 +46,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate: clean up old caches
+// Activate: clean up ALL old caches immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -56,8 +58,28 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: cache-first strategy for all requests
+// Fetch: network-first for HTML/JS/CSS, cache-fallback for offline
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // For same-origin HTML, JS, CSS — try network first, fall back to cache
+  if (url.origin === self.location.origin &&
+      (url.pathname.endsWith('.html') || url.pathname.endsWith('.js') ||
+       url.pathname.endsWith('.css') || url.pathname === '/' || url.pathname.endsWith('/'))) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Update cache with fresh response
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // For other assets (images, manifest, etc.) — cache-first
   event.respondWith(
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );

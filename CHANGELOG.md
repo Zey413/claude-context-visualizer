@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] - 2026-03-31
+
+### Added
+- **Token Calculator** (`token-calculator.js`) — Enhanced text-to-token estimator
+  - CJK-aware heuristic algorithm (English ~4 chars/token, CJK ~1.5 chars/token, Code ~3 chars/token)
+  - Real-time calculation with debounce
+  - Statistics: characters, words, lines, estimated tokens, text type detection
+  - Cost estimation based on current model pricing
+  - Quick-apply buttons (set as System/User/Tools)
+  - History of last 5 calculations
+
+- **Keyboard Help** (`keyboard-help.js`) — Press `?` to open help panel
+  - Modal with all keyboard shortcuts grouped by category
+  - Search/filter functionality
+  - `<kbd>` styled keys like GitHub
+
+### Fixed
+- **Service Worker caching strategy** — Changed from cache-first to network-first for HTML/JS/CSS
+  - Ensures users always get the latest version on reload
+  - Falls back to cache only when offline
+  - Resolves persistent "all-zero dashboard" issue for returning visitors
+
+### Changed
+- Footer keyboard hints now include `?` for help
+- Service worker bumped to v15
+
 ## [3.3.0] - 2026-03-31
 
 ### Added

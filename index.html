@@ -1080,6 +1080,24 @@
       </div>
     </section>
 
+    <!-- ====== NEW v3.4: Token Calculator ====== -->
+    <section class="token-calculator-section glass-card scroll-reveal" id="token-calculator-section">
+      <button class="estimator-toggle" id="token-calculator-toggle" aria-expanded="false" aria-controls="token-calculator-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">🔢</span>
+          <h3 class="estimator-toggle__title">Token Calculator</h3>
+          <span class="badge badge--new">NEW</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="token-calculator-body" id="token-calculator-body" style="display:none;">
+        <p class="section-desc">Paste any text to estimate its token count. Supports English, CJK, and code with language-aware heuristics. Press <kbd>?</kbd> for keyboard shortcuts.</p>
+        <div id="token-calculator-container"></div>
+      </div>
+    </section>
+
     <!-- Conversation Replay -->
     <section class="replay-card glass-card" id="replay-card">
       <button class="estimator-toggle" id="replay-toggle" aria-expanded="false" aria-controls="replay-body">
@@ -1153,8 +1171,8 @@
           <option value="ja">日本語</option>
         </select>
       </div>
-      <p>Built with ✨ by <a href="https://github.com/Zey413" target="_blank" rel="noopener">@Zey413</a> <span class="footer__version">v3.3.0</span></p>
-      <p class="footer__hint">Keyboard: <kbd>R</kbd> Reset &middot; <kbd>1</kbd>-<kbd>4</kbd> Presets &middot; <kbd>C</kbd> Compare &middot; <kbd>D</kbd> Dashboard &middot; <kbd>T</kbd> Theme</p>
+      <p>Built with ✨ by <a href="https://github.com/Zey413" target="_blank" rel="noopener">@Zey413</a> <span class="footer__version">v3.4.0</span></p>
+      <p class="footer__hint">Keyboard: <kbd>R</kbd> Reset &middot; <kbd>1</kbd>-<kbd>4</kbd> Presets &middot; <kbd>C</kbd> Compare &middot; <kbd>D</kbd> Dashboard &middot; <kbd>T</kbd> Theme &middot; <kbd>?</kbd> Help</p>
     </footer>
   </div>
 
@@ -1184,6 +1202,8 @@
   <script src="js/guided-tour.js" defer></script>
   <script src="js/conversation-analyzer.js" defer></script>
   <script src="js/template-builder.js" defer></script>
+  <script src="js/keyboard-help.js" defer></script>
+  <script src="js/token-calculator.js" defer></script>
   <script src="js/app.js" defer></script>
   <script>
     if ('serviceWorker' in navigator) {

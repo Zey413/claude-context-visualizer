@@ -1,6 +1,6 @@
 # Claude Context Window Visualizer
 
-![Version](https://img.shields.io/badge/version-3.3.0-8B5CF6)
+![Version](https://img.shields.io/badge/version-3.4.0-8B5CF6)
 ![HTML](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -11,7 +11,7 @@
 Interactive visualization of Claude's context window token usage. Features an animated SVG donut gauge, **realtime context monitor**, **alert timeline with replay**, **token waterfall analysis**, **context compaction simulator**, **model cost heatmap**, **all-model comparison dashboard**, **advanced charts (Pie/Radar/Trend)**, **Claude Code memory tracker**, **token flow stream animation**, model comparison mode, token estimator, API response parser, analytics panel, conversation simulator, usage timeline, and full internationalization -- all in a zero-dependency PWA with dark glassmorphism UI.
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Claude-Context_Visualizer_v3.3-8B5CF6?style=for-the-badge" alt="Claude Context Visualizer v3.3"/>
+  <img src="https://img.shields.io/badge/Claude-Context_Visualizer_v3.4-8B5CF6?style=for-the-badge" alt="Claude Context Visualizer v3.4"/>
 </p>
 
 <p align="center">
@@ -19,6 +19,12 @@ Interactive visualization of Claude's context window token usage. Features an an
 </p>
 
 ---
+
+## What's New in v3.4
+
+- **Token Calculator** -- Enhanced text-to-token estimator with CJK/code-aware heuristics, real-time stats, cost estimation, and quick-apply buttons.
+- **Keyboard Help** -- Press `?` to view all keyboard shortcuts in a searchable modal panel.
+- **Service Worker Fix** -- Network-first caching strategy ensures returning visitors always get the latest version.
 
 ## What's New in v3.3
 
