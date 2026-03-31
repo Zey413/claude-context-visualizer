@@ -1186,6 +1186,12 @@
       var model = CLAUDE_MODELS[state.modelIndex];
       Charts.update(state.tokens, model.contextWindow, state.timeline);
     }
+
+    // Update token stream if open
+    if (typeof TokenStream !== 'undefined' && TokenStream.isInited()) {
+      var streamModel = CLAUDE_MODELS[state.modelIndex];
+      TokenStream.setTokens(state.tokens, streamModel.contextWindow);
+    }
   }
 
   // ---- Keyboard Shortcuts ----
@@ -2736,6 +2742,13 @@
     log.scrollTop = log.scrollHeight;
   }
 
+  // ---- Token Stream ----
+  function initTokenStream() {
+    if (typeof TokenStream !== 'undefined') {
+      TokenStream.init();
+    }
+  }
+
   // ---- Memory Tracker ----
   function initMemoryTracker() {
     if (typeof MemoryTracker !== 'undefined') {
@@ -2771,6 +2784,7 @@
     initDashboard();
     initCharts();
     initMemoryTracker();
+    initTokenStream();
     initEstimator();
     initAnalytics();
     initPricing();

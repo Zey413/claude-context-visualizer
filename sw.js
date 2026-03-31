@@ -11,6 +11,7 @@ const ASSETS = [
   './js/dashboard.js',
   './js/charts.js',
   './js/memory-tracker.js',
+  './js/stream.js',
   './js/app.js',
   './assets/favicon.svg',
   './manifest.json',

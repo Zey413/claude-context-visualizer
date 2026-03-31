@@ -318,6 +318,25 @@
           </div>
         </div>
 
+        <!-- Token Flow Stream -->
+        <div class="stream-card glass-card" id="stream-card">
+          <button class="estimator-toggle" id="stream-toggle" aria-expanded="false" aria-controls="stream-body">
+            <div class="estimator-toggle__left">
+              <span class="estimator-toggle__icon" aria-hidden="true">\uD83C\uDF0A</span>
+              <h3 class="estimator-toggle__title">Token Flow Stream</h3>
+            </div>
+            <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="stream-body" id="stream-body">
+            <div class="stream-canvas-wrapper">
+              <canvas id="stream-canvas" class="stream-canvas" aria-hidden="true"></canvas>
+            </div>
+            <p class="stream-hint">Particles flow toward the context window. Color = category, density = usage volume.</p>
+          </div>
+        </div>
+
         <!-- Claude Code Memory Tracker -->
         <div class="memory-card glass-card" id="memory-card">
           <button class="estimator-toggle" id="memory-toggle" aria-expanded="false" aria-controls="memory-body">
@@ -924,6 +943,7 @@
   <script src="js/dashboard.js"></script>
   <script src="js/charts.js"></script>
   <script src="js/memory-tracker.js"></script>
+  <script src="js/stream.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
