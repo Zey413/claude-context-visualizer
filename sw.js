@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ctx-viz-v2';
+const CACHE_NAME = 'ctx-viz-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -10,7 +10,9 @@ const ASSETS = [
   './js/share.js',
   './js/app.js',
   './assets/favicon.svg',
-  './manifest.json'
+  './manifest.json',
+  './robots.txt',
+  './sitemap.xml'
 ];
 
 // Install: pre-cache all static assets
