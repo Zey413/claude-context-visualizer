@@ -263,8 +263,8 @@
     categories.forEach(cat => {
       const color = getCatColor(cat);
       if (dotEls[cat]) dotEls[cat].style.background = color;
-      sliders[cat].style.setProperty('--slider-color', color);
-      barEls[cat].style.setProperty('--cat-color', color);
+      if (sliders[cat]) sliders[cat].style.setProperty('--slider-color', color);
+      if (barEls[cat]) barEls[cat].style.setProperty('--cat-color', color);
       // Sync breakdown bar segment & label colors
       if (breakdownSegments[cat]) breakdownSegments[cat].style.setProperty('--seg-color', color);
       if (breakdownLabels[cat]) breakdownLabels[cat].style.color = color;

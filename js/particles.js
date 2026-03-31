@@ -106,13 +106,17 @@ class ParticleSystem {
    */
   stop() {
     this.running = false;
+    if (this._rafId) {
+      cancelAnimationFrame(this._rafId);
+      this._rafId = null;
+    }
   }
 
   _loop() {
     if (!this.running) return;
     this._update();
     this._draw();
-    requestAnimationFrame(() => this._loop());
+    this._rafId = requestAnimationFrame(() => this._loop());
   }
 
   _update() {
@@ -160,30 +164,31 @@ class ParticleSystem {
     const isDanger = this.usagePercent > 80;
     const dangerIntensity = isDanger ? Math.min((this.usagePercent - 80) / 20, 1) : 0;
 
-    for (const p of this.particles) {
-      // Interpolate color between normal and danger
-      const normalColor = this.normalColors[p.colorIndex];
-      const r = Math.round(normalColor.r + (this.dangerColor.r - normalColor.r) * dangerIntensity);
-      const g = Math.round(normalColor.g + (this.dangerColor.g - normalColor.g) * dangerIntensity);
-      const b = Math.round(normalColor.b + (this.dangerColor.b - normalColor.b) * dangerIntensity);
+    // Compute a single blended color per frame (use primary purple as representative)
+    // This avoids per-particle color interpolation and string allocation
+    const avgNormal = this.normalColors[0];
+    const r = Math.round(avgNormal.r + (this.dangerColor.r - avgNormal.r) * dangerIntensity);
+    const g = Math.round(avgNormal.g + (this.dangerColor.g - avgNormal.g) * dangerIntensity);
+    const b = Math.round(avgNormal.b + (this.dangerColor.b - avgNormal.b) * dangerIntensity);
 
-      // Draw particle with glow
-      this.ctx.save();
-      this.ctx.globalAlpha = p.alpha;
+    const ctx = this.ctx;
+
+    for (const p of this.particles) {
+      ctx.globalAlpha = p.alpha;
 
       // Outer glow
-      this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-      this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.alpha * 0.15})`;
-      this.ctx.fill();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha * 0.15})`;
+      ctx.fill();
 
       // Core
-      this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.alpha})`;
-      this.ctx.fill();
-
-      this.ctx.restore();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
+      ctx.fill();
     }
+
+    ctx.globalAlpha = 1;
   }
 }
