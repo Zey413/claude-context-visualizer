@@ -33,6 +33,127 @@
   // Track whether we were previously in danger zone (for shake trigger)
   let _wasDanger = false;
 
+  // Track previous efficiency score label for confetti trigger
+  let _prevScoreLabel = '';
+
+  // ---- Smooth Number Counter Animation ----
+  const _activeAnimations = {};
+
+  /**
+   * Animate a numeric value counting up/down over a given duration.
+   * @param {HTMLElement} element - DOM element whose textContent to animate
+   * @param {number} start - Starting value
+   * @param {number} end - Ending value
+   * @param {number} duration - Animation duration in ms (default 300)
+   */
+  function animateValue(element, start, end, duration) {
+    if (!element) return;
+    duration = duration || 300;
+
+    var id = element.id || ('_anim_' + Math.random());
+    if (_activeAnimations[id]) {
+      cancelAnimationFrame(_activeAnimations[id]);
+      delete _activeAnimations[id];
+    }
+
+    if (start === end) {
+      element.textContent = formatNumber(end);
+      return;
+    }
+
+    var startTime = performance.now();
+    var diff = end - start;
+
+    function step(now) {
+      var elapsed = now - startTime;
+      var progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var current = Math.round(start + diff * eased);
+      element.textContent = formatNumber(current);
+
+      if (progress < 1) {
+        _activeAnimations[id] = requestAnimationFrame(step);
+      } else {
+        element.textContent = formatNumber(end);
+        delete _activeAnimations[id];
+      }
+    }
+
+    _activeAnimations[id] = requestAnimationFrame(step);
+  }
+
+  /**
+   * Parse a formatted number string back to an integer (e.g. "1,234" -> 1234).
+   */
+  function parseDisplayedNumber(el) {
+    if (!el) return 0;
+    return parseInt(el.textContent.replace(/,/g, '').trim(), 10) || 0;
+  }
+
+  // ---- Confetti Effect ----
+  /**
+   * Trigger a brief CSS confetti burst — 20 colored dots falling from top.
+   */
+  function triggerConfetti() {
+    var container = document.createElement('div');
+    container.className = 'confetti-container';
+    container.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(container);
+
+    var colors = ['#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#EC4899', '#14B8A6'];
+    for (var i = 0; i < 20; i++) {
+      var dot = document.createElement('div');
+      dot.className = 'confetti-dot';
+      dot.style.left = (Math.random() * 100) + '%';
+      dot.style.background = colors[i % colors.length];
+      dot.style.animationDelay = (Math.random() * 0.5) + 's';
+      dot.style.animationDuration = (1 + Math.random() * 1) + 's';
+      container.appendChild(dot);
+    }
+
+    // Remove after animations complete
+    setTimeout(function () {
+      if (container.parentNode) container.parentNode.removeChild(container);
+    }, 2500);
+  }
+
+  // ---- Welcome Onboarding Tooltip ----
+  function initOnboardingTooltip() {
+    var ONBOARD_KEY = 'claude-ctx-onboarded';
+    if (localStorage.getItem(ONBOARD_KEY)) return;
+
+    var tooltip = document.createElement('div');
+    tooltip.className = 'onboarding-tooltip';
+    tooltip.innerHTML =
+      '<span class="onboarding-tooltip__text">Drag the sliders to adjust token allocation \u2192</span>' +
+      '<button class="onboarding-tooltip__btn" id="onboarding-dismiss">Got it</button>';
+
+    // Insert near the gauge
+    var gaugeCard = document.getElementById('gauge-card-primary');
+    if (gaugeCard) {
+      gaugeCard.style.position = 'relative';
+      gaugeCard.appendChild(tooltip);
+    }
+
+    // Force reflow then show
+    void tooltip.offsetWidth;
+    tooltip.classList.add('onboarding-tooltip--visible');
+
+    function dismiss() {
+      tooltip.classList.remove('onboarding-tooltip--visible');
+      localStorage.setItem(ONBOARD_KEY, '1');
+      setTimeout(function () {
+        if (tooltip.parentNode) tooltip.parentNode.removeChild(tooltip);
+      }, 300);
+    }
+
+    document.getElementById('onboarding-dismiss').addEventListener('click', dismiss);
+
+    // Auto-dismiss after 8 seconds
+    setTimeout(dismiss, 8000);
+  }
+
   // ---- DOM References ----
   const modelSelect = document.getElementById('model-select');
   const gaugeStatus = document.getElementById('gauge-status');
@@ -611,9 +732,11 @@
     // Update particle system with current usage
     particles.setUsage(percent);
 
-    // Update cards
+    // Update cards (with animated counters)
     categories.forEach(cat => {
-      valueEls[cat].textContent = formatNumber(state.tokens[cat]);
+      var oldVal = parseDisplayedNumber(valueEls[cat]);
+      var newVal = state.tokens[cat];
+      animateValue(valueEls[cat], oldVal, newVal, 300);
       const pct = model.contextWindow > 0 ? (state.tokens[cat] / model.contextWindow) * 100 : 0;
       barEls[cat].style.width = pct + '%';
       percentEls[cat].textContent = pct.toFixed(1) + '%';
@@ -630,9 +753,11 @@
     // Update sparklines
     renderSparklines();
 
-    // Stats bar
-    statTotalUsed.textContent = formatNumber(total);
-    statRemaining.textContent = formatNumber(Math.max(0, model.contextWindow - total));
+    // Stats bar (animated counters)
+    var oldTotalUsed = parseDisplayedNumber(statTotalUsed);
+    var oldRemaining = parseDisplayedNumber(statRemaining);
+    animateValue(statTotalUsed, oldTotalUsed, total, 300);
+    animateValue(statRemaining, oldRemaining, Math.max(0, model.contextWindow - total), 300);
     statContextWindow.textContent = formatTokensShort(model.contextWindow);
     statOutputLimit.textContent = formatTokensShort(model.outputLimit);
 
@@ -918,6 +1043,12 @@
       scoreBadgeEl.className = 'analytics-score__badge analytics-score__badge--' + scoreInfo.cls;
     }
 
+    // Trigger confetti when score first reaches Excellent
+    if (scoreInfo.label === 'Excellent' && _prevScoreLabel !== 'Excellent') {
+      triggerConfetti();
+    }
+    _prevScoreLabel = scoreInfo.label;
+
     // Cost estimate
     const cost = calcCostEstimate(state.tokens, model);
     const costValueEl = document.getElementById('cost-value');
@@ -1084,6 +1215,9 @@
     if (typeof I18n !== 'undefined') {
       I18n.applyTranslations();
     }
+
+    // Show onboarding tooltip on first visit
+    initOnboardingTooltip();
   }
 
   // ---- Theme Toggle ----

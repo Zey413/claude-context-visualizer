@@ -384,6 +384,127 @@
       </div>
     </section>
 
+    <!-- API Response Parser -->
+    <section class="api-parser-card glass-card" id="api-parser-card">
+      <button class="estimator-toggle" id="api-parser-toggle" aria-expanded="false" aria-controls="api-parser-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">📡</span>
+          <h3 class="estimator-toggle__title">API Response Parser</h3>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="api-parser-body" id="api-parser-body">
+        <!-- Paste & Parse -->
+        <div class="api-parser-input-section">
+          <label class="api-parser-label" for="api-response-textarea">Paste Claude API Response JSON</label>
+          <div class="api-parser-textarea-wrap">
+            <textarea id="api-response-textarea" class="api-parser-textarea" placeholder='{"id":"msg_...","usage":{"input_tokens":1234,"output_tokens":567,...}}' rows="5" aria-label="Claude API response JSON"></textarea>
+          </div>
+          <div class="api-parser-actions">
+            <button class="api-parser-btn api-parser-btn--parse" id="api-parse-btn" title="Parse the JSON and extract token usage">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="4 17 10 11 4 5"/>
+                <line x1="12" y1="19" x2="20" y2="19"/>
+              </svg>
+              Parse &amp; Apply
+            </button>
+            <button class="api-parser-btn api-parser-btn--clear" id="api-clear-btn" title="Clear the textarea and results">Clear</button>
+          </div>
+        </div>
+
+        <!-- Parsed Result Summary -->
+        <div class="api-parser-result" id="api-parser-result" style="display:none;">
+          <div class="api-parser-result__title">Parsed Token Usage</div>
+          <div class="api-parser-result__grid">
+            <div class="api-parser-result__item">
+              <span class="api-parser-result__label">Input Tokens</span>
+              <span class="api-parser-result__value" id="parsed-input-tokens">0</span>
+            </div>
+            <div class="api-parser-result__item">
+              <span class="api-parser-result__label">Output Tokens</span>
+              <span class="api-parser-result__value" id="parsed-output-tokens">0</span>
+            </div>
+            <div class="api-parser-result__item">
+              <span class="api-parser-result__label">Cache Created</span>
+              <span class="api-parser-result__value" id="parsed-cache-creation">0</span>
+            </div>
+            <div class="api-parser-result__item">
+              <span class="api-parser-result__label">Cache Read</span>
+              <span class="api-parser-result__value" id="parsed-cache-read">0</span>
+            </div>
+          </div>
+          <div class="api-parser-mapping">
+            <div class="api-parser-mapping__title">Token Mapping Preview</div>
+            <div class="api-parser-mapping__row">
+              <span class="api-parser-mapping__dot" style="background:#8B5CF6"></span>
+              <span class="api-parser-mapping__label">System</span>
+              <span class="api-parser-mapping__value" id="mapped-system">0</span>
+            </div>
+            <div class="api-parser-mapping__row">
+              <span class="api-parser-mapping__dot" style="background:#3B82F6"></span>
+              <span class="api-parser-mapping__label">User</span>
+              <span class="api-parser-mapping__value" id="mapped-user">0</span>
+            </div>
+            <div class="api-parser-mapping__row">
+              <span class="api-parser-mapping__dot" style="background:#10B981"></span>
+              <span class="api-parser-mapping__label">Assistant</span>
+              <span class="api-parser-mapping__value" id="mapped-assistant">0</span>
+            </div>
+            <div class="api-parser-mapping__row">
+              <span class="api-parser-mapping__dot" style="background:#F59E0B"></span>
+              <span class="api-parser-mapping__label">Tools</span>
+              <span class="api-parser-mapping__value" id="mapped-tools">0</span>
+            </div>
+          </div>
+          <button class="api-parser-btn api-parser-btn--apply" id="api-apply-btn" title="Apply parsed tokens to the gauge sliders">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Apply to Gauge
+          </button>
+        </div>
+
+        <!-- Error display -->
+        <div class="api-parser-error" id="api-parser-error" style="display:none;" role="alert"></div>
+
+        <!-- Simulate Conversation -->
+        <div class="api-parser-simulate">
+          <div class="api-parser-simulate__title">Simulate Conversation</div>
+          <p class="api-parser-simulate__desc">Animate a multi-turn conversation filling up the context window over 5 seconds.</p>
+          <div class="api-parser-simulate__controls">
+            <button class="api-parser-btn api-parser-btn--simulate" id="api-simulate-btn" title="Start conversation growth simulation">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              Simulate Growth
+            </button>
+            <button class="api-parser-btn api-parser-btn--stop" id="api-simulate-stop-btn" style="display:none;" title="Stop simulation">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="6" y="4" width="4" height="16"/>
+                <rect x="14" y="4" width="4" height="16"/>
+              </svg>
+              Stop
+            </button>
+            <span class="api-parser-simulate__status" id="api-simulate-status"></span>
+          </div>
+        </div>
+
+        <!-- Conversation Turns Counter -->
+        <div class="api-parser-turns" id="api-parser-turns">
+          <div class="api-parser-turns__icon" aria-hidden="true">💬</div>
+          <div class="api-parser-turns__info">
+            <span class="api-parser-turns__label">Estimated Turns Remaining</span>
+            <span class="api-parser-turns__value" id="turns-remaining">--</span>
+          </div>
+          <div class="api-parser-turns__detail" id="turns-detail">
+            Based on avg. message size
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
       <div class="footer__controls">
