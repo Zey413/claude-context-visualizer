@@ -2392,7 +2392,6 @@ body {
     box-shadow: 0 0 0 3px var(--accent-purple), 0 0 10px color-mix(in srgb, var(--slider-color) 40%, transparent);
   }
 }
-}
 
 /* Gauge segment focus for keyboard navigation */
 .gauge-segment:focus-visible {
