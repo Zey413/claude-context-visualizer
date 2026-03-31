@@ -418,8 +418,8 @@
   function updateSliderMax() {
     const model = CLAUDE_MODELS[state.modelIndex];
     categories.forEach(cat => {
-      sliders[cat].max = model.contextWindow;
-      inputs[cat].max = model.contextWindow;
+      if (sliders[cat]) sliders[cat].max = model.contextWindow;
+      if (inputs[cat]) inputs[cat].max = model.contextWindow;
     });
   }
 
@@ -440,13 +440,14 @@
 
   function syncSlidersFromState() {
     categories.forEach(cat => {
-      sliders[cat].value = state.tokens[cat];
-      inputs[cat].value = state.tokens[cat];
+      if (sliders[cat]) sliders[cat].value = state.tokens[cat];
+      if (inputs[cat]) inputs[cat].value = state.tokens[cat];
     });
   }
 
   function initSliders() {
     categories.forEach(cat => {
+      if (!sliders[cat] || !inputs[cat]) return;
       // Slider input
       sliders[cat].addEventListener('input', () => {
         const val = parseInt(sliders[cat].value) || 0;
