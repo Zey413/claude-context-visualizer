@@ -290,4 +290,17 @@ class GaugeRenderer {
   _hideTooltip() {
     this.tooltip.classList.remove('gauge-tooltip--visible');
   }
+
+  /**
+   * Update segment stroke colors. Accepts an array of 4 colors
+   * in category order: [system, user, assistant, tools].
+   */
+  setSegmentColors(colors) {
+    const cats = ['system', 'user', 'assistant', 'tools'];
+    cats.forEach((cat, i) => {
+      if (this.segments[cat] && colors[i]) {
+        this.segments[cat].setAttribute('stroke', colors[i]);
+      }
+    });
+  }
 }

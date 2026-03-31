@@ -313,6 +313,46 @@
       </div>
     </section>
 
+    <!-- Analytics & Insights -->
+    <section class="analytics-card glass-card" id="analytics-card">
+      <button class="estimator-toggle" id="analytics-toggle" aria-expanded="false" aria-controls="analytics-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">📊</span>
+          <h3 class="estimator-toggle__title">Analytics & Insights</h3>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="analytics-body" id="analytics-body">
+        <div class="analytics-grid">
+          <!-- Efficiency Score -->
+          <div class="analytics-item">
+            <div class="analytics-item__label">Efficiency Score</div>
+            <div class="analytics-item__score" id="analytics-score">
+              <span class="analytics-score__value" id="score-value">--</span>
+              <span class="analytics-score__badge" id="score-badge">N/A</span>
+            </div>
+          </div>
+          <!-- Cost Estimate -->
+          <div class="analytics-item">
+            <div class="analytics-item__label">Cost Estimate</div>
+            <div class="analytics-item__cost" id="analytics-cost">
+              <span class="analytics-cost__value" id="cost-value">$0.000</span>
+              <span class="analytics-cost__sublabel">per request</span>
+            </div>
+          </div>
+        </div>
+        <!-- Optimization Tips -->
+        <div class="analytics-tips" id="analytics-tips">
+          <div class="analytics-tips__title">Optimization Tips</div>
+          <ul class="analytics-tips__list" id="tips-list">
+            <li class="analytics-tip">Adjust sliders to see personalized tips</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
       <div class="footer__controls">

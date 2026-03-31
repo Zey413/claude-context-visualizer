@@ -10,7 +10,8 @@ const CLAUDE_MODELS = [
     contextWindow: 1000000,
     outputLimit: 32000,
     color: '#A855F7',
-    description: 'Most capable, 1M token context'
+    description: 'Most capable, 1M token context',
+    pricing: { inputPerMTok: 15, outputPerMTok: 75 }
   },
   {
     id: 'claude-4-sonnet-200k',
@@ -18,7 +19,8 @@ const CLAUDE_MODELS = [
     contextWindow: 200000,
     outputLimit: 16000,
     color: '#6366F1',
-    description: 'Balanced performance, 200K context'
+    description: 'Balanced performance, 200K context',
+    pricing: { inputPerMTok: 3, outputPerMTok: 15 }
   },
   {
     id: 'claude-3.5-sonnet-200k',
@@ -26,7 +28,8 @@ const CLAUDE_MODELS = [
     contextWindow: 200000,
     outputLimit: 8192,
     color: '#3B82F6',
-    description: 'Fast & intelligent, 200K context'
+    description: 'Fast & intelligent, 200K context',
+    pricing: { inputPerMTok: 3, outputPerMTok: 15 }
   },
   {
     id: 'claude-3.5-haiku-200k',
@@ -34,7 +37,8 @@ const CLAUDE_MODELS = [
     contextWindow: 200000,
     outputLimit: 8192,
     color: '#06B6D4',
-    description: 'Fastest, cost-effective, 200K context'
+    description: 'Fastest, cost-effective, 200K context',
+    pricing: { inputPerMTok: 0.80, outputPerMTok: 4 }
   },
   {
     id: 'claude-3-opus-200k',
@@ -42,7 +46,8 @@ const CLAUDE_MODELS = [
     contextWindow: 200000,
     outputLimit: 4096,
     color: '#8B5CF6',
-    description: 'Previous gen flagship, 200K context'
+    description: 'Previous gen flagship, 200K context',
+    pricing: { inputPerMTok: 15, outputPerMTok: 75 }
   }
 ];
 

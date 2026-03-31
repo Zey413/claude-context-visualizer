@@ -15,6 +15,7 @@
     compareMode: false,
     compareModelIndex: 1,
     timeline: [],          // Array of snapshot objects { tokens, modelIndex, percent }
+    customColors: {},      // { system: '#...', user: '#...', ... } — persisted separately
   };
 
   const STORAGE_KEY = 'claude-ctx-viz';
@@ -46,12 +47,14 @@
   const compareModelSelect = document.getElementById('compare-model-select');
   const timelineChart = document.getElementById('timeline-chart');
   const timelineCount = document.getElementById('timeline-count');
+  const gaugeContainer = document.getElementById('gauge-container');
 
   const sliders = {};
   const inputs = {};
   const valueEls = {};
   const barEls = {};
   const percentEls = {};
+  const dotEls = {};
 
   const categories = ['system', 'user', 'assistant', 'tools'];
   const SPARKLINE_COLORS = {
@@ -68,6 +71,14 @@
     percentEls[cat] = document.getElementById(`${cat}-percent`);
   });
 
+  // Collect slider dots for color cycling
+  document.querySelectorAll('.slider-row').forEach(row => {
+    const cat = row.dataset.category;
+    if (cat) {
+      dotEls[cat] = row.querySelector('.slider-label__dot');
+    }
+  });
+
   const statTotalUsed = document.getElementById('stat-total-used');
   const statRemaining = document.getElementById('stat-remaining');
   const statContextWindow = document.getElementById('stat-context-window');
@@ -80,6 +91,102 @@
   // ---- Particle System ----
   const particles = new ParticleSystem();
   particles.start();
+
+
+  // ---- Category Color Helpers ----
+
+  /**
+   * Get the active color for a category, falling back to the default.
+   */
+  function getCatColor(cat) {
+    return state.customColors[cat] || TOKEN_CATEGORIES.find(c => c.id === cat).color;
+  }
+
+  /**
+   * Apply current custom colors to all UI elements: dots, sliders, bars, gauge segments.
+   */
+  function applyCustomColors() {
+    categories.forEach(cat => {
+      const color = getCatColor(cat);
+      if (dotEls[cat]) dotEls[cat].style.background = color;
+      sliders[cat].style.setProperty('--slider-color', color);
+      barEls[cat].style.setProperty('--cat-color', color);
+    });
+    gauge.setSegmentColors(categories.map(getCatColor));
+    if (gaugeCompare) {
+      gaugeCompare.setSegmentColors(categories.map(getCatColor));
+    }
+  }
+
+  function saveColors() {
+    try {
+      localStorage.setItem(COLORS_KEY, JSON.stringify(state.customColors));
+    } catch (e) { /* ignore */ }
+  }
+
+  function loadColors() {
+    try {
+      const raw = localStorage.getItem(COLORS_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      categories.forEach(cat => {
+        if (typeof data[cat] === 'string') {
+          state.customColors[cat] = data[cat];
+        }
+      });
+    } catch (e) { /* ignore */ }
+  }
+
+  /**
+   * Initialize click-to-cycle on category color dots.
+   */
+  function initColorCycling() {
+    categories.forEach(cat => {
+      const dot = dotEls[cat];
+      if (!dot) return;
+      dot.title = 'Click to cycle color';
+      dot.addEventListener('click', (e) => {
+        e.preventDefault();
+        const palette = COLOR_PRESETS[cat];
+        const current = getCatColor(cat);
+        const idx = palette.indexOf(current);
+        const next = palette[(idx + 1) % palette.length];
+        state.customColors[cat] = next;
+        applyCustomColors();
+        saveColors();
+      });
+    });
+  }
+
+  // ---- Gauge Animations ----
+
+  /**
+   * Trigger the burst animation on the gauge container.
+   */
+  function triggerGaugeBurst() {
+    if (!gaugeContainer) return;
+    gaugeContainer.classList.remove('gauge-container--burst');
+    void gaugeContainer.offsetWidth;
+    gaugeContainer.classList.add('gauge-container--burst');
+    gaugeContainer.addEventListener('animationend', function handler() {
+      gaugeContainer.classList.remove('gauge-container--burst');
+      gaugeContainer.removeEventListener('animationend', handler);
+    });
+  }
+
+  /**
+   * Trigger screen shake on the primary gauge card when entering danger zone.
+   */
+  function triggerDangerShake() {
+    if (!gaugeCardPrimary) return;
+    gaugeCardPrimary.classList.remove('gauge-card--shake');
+    void gaugeCardPrimary.offsetWidth;
+    gaugeCardPrimary.classList.add('gauge-card--shake');
+    gaugeCardPrimary.addEventListener('animationend', function handler() {
+      gaugeCardPrimary.classList.remove('gauge-card--shake');
+      gaugeCardPrimary.removeEventListener('animationend', handler);
+    });
+  }
 
   // ---- Init Models ----
   function initModelSelect() {
@@ -138,6 +245,9 @@
       state.tokens[cat] = Math.round(model.contextWindow * preset.allocation[cat]);
     });
     state.activePreset = index;
+
+    // Trigger burst animation on preset switch
+    triggerGaugeBurst();
 
     syncSlidersFromState();
     pushTimelineSnapshot();
@@ -262,6 +372,7 @@
     if (snapshots.length === 0) {
       const emptyText = typeof I18n !== 'undefined' ? I18n.t('adjustSlidersToRecord') : 'Adjust sliders to record snapshots';
       timelineChart.innerHTML = `<div class="timeline-empty">${emptyText}</div>`;
+      renderSparklines();
       return;
     }
 
@@ -391,6 +502,8 @@
       // Lazily create compare gauge
       if (!gaugeCompare) {
         gaugeCompare = new GaugeRenderer('gauge-container-compare');
+        // Apply custom colors to the compare gauge too
+        gaugeCompare.setSegmentColors(categories.map(getCatColor));
       }
 
       // Set compare model select to a different model than primary if same
@@ -478,7 +591,6 @@
     gauge.update(state.tokens, model.contextWindow);
 
     // Update primary gauge ARIA progressbar
-    const gaugeContainer = document.getElementById('gauge-container');
     if (gaugeContainer) {
       gaugeContainer.setAttribute('aria-valuenow', Math.round(percent));
     }
@@ -511,7 +623,8 @@
     // Status indicator (with i18n)
     const statusText = gaugeStatus.querySelector('.gauge-status__text');
     gaugeStatus.classList.remove('gauge-status--warning', 'gauge-status--danger');
-    if (percent >= 90) {
+    const isDanger = percent >= 90;
+    if (isDanger) {
       gaugeStatus.classList.add('gauge-status--danger');
       statusText.textContent = typeof I18n !== 'undefined' ? I18n.t('statusCritical') : 'Critical';
     } else if (percent >= 70) {
@@ -524,6 +637,12 @@
     // Remaining color
     statRemaining.style.color = percent >= 90 ? '#EF4444' : percent >= 70 ? '#F59E0B' : '#10B981';
 
+    // Trigger screen shake when first entering danger zone (>90%)
+    if (isDanger && !_wasDanger) {
+      triggerDangerShake();
+    }
+    _wasDanger = isDanger;
+
     // Preset button active state
     document.querySelectorAll('.preset-btn').forEach((btn, i) => {
       btn.classList.toggle('preset-btn--active', i === state.activePreset);
@@ -533,6 +652,9 @@
     if (state.compareMode) {
       renderCompareGauge();
     }
+
+    // Update analytics panel
+    updateAnalytics();
   }
 
   // ---- Keyboard Shortcuts ----
@@ -549,6 +671,8 @@
         state.compareMode = !state.compareMode;
         toggleCompareMode();
         save();
+      } else if (e.key === 't' || e.key === 'T') {
+        toggleTheme();
       }
     });
   }
@@ -606,6 +730,164 @@
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  // ---- Analytics & Insights ----
+  const COST_CATEGORIES_INPUT = ['system', 'user', 'tools'];
+  const COST_CATEGORIES_OUTPUT = ['assistant'];
+
+  function initAnalytics() {
+    const toggle = document.getElementById('analytics-toggle');
+    const card = document.getElementById('analytics-card');
+    if (!toggle || !card) return;
+
+    toggle.addEventListener('click', () => {
+      const isOpen = card.classList.toggle('analytics-card--open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  }
+
+  /**
+   * Calculate efficiency score (0-100) based on:
+   * - Token diversity: are multiple categories being used?
+   * - Remaining headroom: sweet spot is 10-30% remaining
+   */
+  function calcEfficiencyScore(tokens, contextWindow) {
+    const total = categories.reduce((s, c) => s + tokens[c], 0);
+    if (total === 0 || contextWindow === 0) return 0;
+
+    const remainPct = ((contextWindow - total) / contextWindow) * 100;
+
+    // Diversity score (0-50): how many categories are used & how balanced
+    const nonZero = categories.filter(c => tokens[c] > 0).length;
+    const diversityBase = (nonZero / categories.length) * 30; // up to 30 pts for using all categories
+
+    // Balance bonus: penalise if one category dominates (>70% of used)
+    let balanceBonus = 0;
+    if (total > 0) {
+      const maxCatPct = Math.max(...categories.map(c => tokens[c] / total));
+      balanceBonus = (1 - maxCatPct) * 20; // up to 20 pts for balance
+    }
+
+    // Headroom score (0-50): sweet spot is 10-30% remaining
+    let headroomScore = 0;
+    if (remainPct >= 10 && remainPct <= 30) {
+      headroomScore = 50; // perfect
+    } else if (remainPct > 30 && remainPct <= 50) {
+      headroomScore = 35;
+    } else if (remainPct > 50 && remainPct <= 80) {
+      headroomScore = 20;
+    } else if (remainPct > 80) {
+      headroomScore = 10; // too much room, probably underutilized
+    } else if (remainPct >= 5 && remainPct < 10) {
+      headroomScore = 30; // tight but ok
+    } else {
+      headroomScore = 10; // <5% remaining — dangerously close
+    }
+
+    return Math.min(100, Math.round(diversityBase + balanceBonus + headroomScore));
+  }
+
+  function getScoreLabel(score) {
+    if (score >= 80) return { label: 'Excellent', cls: 'excellent', color: 'var(--accent-green)' };
+    if (score >= 60) return { label: 'Good', cls: 'good', color: 'var(--accent-blue)' };
+    if (score >= 40) return { label: 'Fair', cls: 'fair', color: 'var(--accent-amber)' };
+    return { label: 'Poor', cls: 'poor', color: 'var(--accent-red)' };
+  }
+
+  /**
+   * Calculate estimated cost per request based on model pricing.
+   * Input = system + user + tools, Output = assistant.
+   */
+  function calcCostEstimate(tokens, model) {
+    const inputTokens = COST_CATEGORIES_INPUT.reduce((s, c) => s + tokens[c], 0);
+    const outputTokens = COST_CATEGORIES_OUTPUT.reduce((s, c) => s + tokens[c], 0);
+
+    const inputCost = (inputTokens / 1_000_000) * model.pricing.inputPerMTok;
+    const outputCost = (outputTokens / 1_000_000) * model.pricing.outputPerMTok;
+
+    return inputCost + outputCost;
+  }
+
+  /**
+   * Generate optimization tips based on current token allocation.
+   */
+  function generateTips(tokens, contextWindow) {
+    const total = categories.reduce((s, c) => s + tokens[c], 0);
+    if (total === 0 || contextWindow === 0) {
+      return [{ text: 'Adjust sliders to see personalized tips', cls: '' }];
+    }
+
+    const tips = [];
+    const systemPct = tokens.system / contextWindow;
+    const toolsPct = tokens.tools / contextWindow;
+    const remainPct = (contextWindow - total) / contextWindow;
+
+    if (systemPct > 0.10) {
+      tips.push({ text: 'Consider reducing system prompt length', cls: 'analytics-tip--amber' });
+    }
+    if (toolsPct > 0.30) {
+      tips.push({ text: 'Heavy tool usage detected \u2014 consider schema optimization', cls: 'analytics-tip--amber' });
+    }
+    if (remainPct < 0.10) {
+      tips.push({ text: 'Near limit \u2014 consider summarizing conversation history', cls: 'analytics-tip--red' });
+    }
+    if (remainPct > 0.80) {
+      tips.push({ text: 'Plenty of room \u2014 you can add more context', cls: 'analytics-tip--green' });
+    }
+
+    // Always have at least one tip
+    if (tips.length === 0) {
+      if (remainPct >= 0.10 && remainPct <= 0.30) {
+        tips.push({ text: 'Great headroom balance \u2014 context usage looks optimal', cls: 'analytics-tip--green' });
+      } else {
+        tips.push({ text: 'Usage looks reasonable for this configuration', cls: 'analytics-tip--blue' });
+      }
+    }
+
+    // Cap at 3 tips
+    return tips.slice(0, 3);
+  }
+
+  /**
+   * Update the analytics panel with current state.
+   */
+  function updateAnalytics() {
+    const model = CLAUDE_MODELS[state.modelIndex];
+
+    // Efficiency score
+    const score = calcEfficiencyScore(state.tokens, model.contextWindow);
+    const scoreInfo = getScoreLabel(score);
+    const scoreValueEl = document.getElementById('score-value');
+    const scoreBadgeEl = document.getElementById('score-badge');
+    if (scoreValueEl) {
+      scoreValueEl.textContent = score;
+      scoreValueEl.style.color = scoreInfo.color;
+    }
+    if (scoreBadgeEl) {
+      scoreBadgeEl.textContent = scoreInfo.label;
+      scoreBadgeEl.className = 'analytics-score__badge analytics-score__badge--' + scoreInfo.cls;
+    }
+
+    // Cost estimate
+    const cost = calcCostEstimate(state.tokens, model);
+    const costValueEl = document.getElementById('cost-value');
+    if (costValueEl) {
+      costValueEl.textContent = '$' + cost.toFixed(3);
+    }
+
+    // Optimization tips
+    const tips = generateTips(state.tokens, model.contextWindow);
+    const tipsList = document.getElementById('tips-list');
+    if (tipsList) {
+      tipsList.innerHTML = '';
+      tips.forEach(tip => {
+        const li = document.createElement('li');
+        li.className = 'analytics-tip' + (tip.cls ? ' ' + tip.cls : '');
+        li.textContent = tip.text;
+        tipsList.appendChild(li);
+      });
     }
   }
 
@@ -716,12 +998,19 @@
     initKeyboard();
     initCompareMode();
     initEstimator();
+    initAnalytics();
     initTheme();
+    initColorCycling();
     initLangSelector();
     initShareButtons();
-    initURLParams();
 
-    const loaded = load();
+    // Load custom colors from localStorage
+    loadColors();
+    applyCustomColors();
+
+    // URL params take priority over localStorage
+    const loadedFromURL = loadURLParams();
+    const loaded = loadedFromURL || load();
     modelSelect.value = state.modelIndex;
     compareModelSelect.value = state.compareModelIndex;
     updateSliderMax();
@@ -750,34 +1039,28 @@
   }
 
   // ---- Theme Toggle ----
+  function toggleTheme() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    if (isLight) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('claude-ctx-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('claude-ctx-theme', 'light');
+    }
+  }
+
   function initTheme() {
     const btn = document.getElementById('theme-toggle');
     if (!btn) return;
-    const moonIcon = btn.querySelector('.icon-moon');
-    const sunIcon = btn.querySelector('.icon-sun');
 
     // Load saved theme
     const saved = localStorage.getItem('claude-ctx-theme');
     if (saved === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
-      if (moonIcon) moonIcon.style.display = 'none';
-      if (sunIcon) sunIcon.style.display = 'block';
     }
 
-    btn.addEventListener('click', () => {
-      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-      if (isLight) {
-        document.documentElement.removeAttribute('data-theme');
-        if (moonIcon) moonIcon.style.display = 'block';
-        if (sunIcon) sunIcon.style.display = 'none';
-        localStorage.setItem('claude-ctx-theme', 'dark');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        if (moonIcon) moonIcon.style.display = 'none';
-        if (sunIcon) sunIcon.style.display = 'block';
-        localStorage.setItem('claude-ctx-theme', 'light');
-      }
-    });
+    btn.addEventListener('click', toggleTheme);
   }
 
   // ---- Language Selector ----
@@ -810,38 +1093,43 @@
         const total = categories.reduce((s, c) => s + state.tokens[c], 0);
         const percent = model.contextWindow > 0 ? (total / model.contextWindow) * 100 : 0;
         ShareModule.exportPNG(state.tokens, model, percent);
-        ShareModule.showToast(typeof I18n !== 'undefined' ? I18n.t('pngExported') : 'PNG exported!');
+        ShareModule.flashButton(btnExport);
       });
     }
 
     if (btnShare) {
-      btnShare.addEventListener('click', async () => {
-        await ShareModule.copyShareLink(state.modelIndex, state.tokens);
-        ShareModule.showToast(typeof I18n !== 'undefined' ? I18n.t('linkCopied') : 'Share link copied!');
+      btnShare.addEventListener('click', () => {
+        ShareModule.copyShareLink(state.modelIndex, state.tokens);
+        ShareModule.flashButton(btnShare);
       });
     }
 
     if (btnCopy) {
-      btnCopy.addEventListener('click', async () => {
+      btnCopy.addEventListener('click', () => {
         const model = CLAUDE_MODELS[state.modelIndex];
         const total = categories.reduce((s, c) => s + state.tokens[c], 0);
         const percent = model.contextWindow > 0 ? (total / model.contextWindow) * 100 : 0;
-        await ShareModule.copyStats(state.tokens, model, percent);
-        ShareModule.showToast(typeof I18n !== 'undefined' ? I18n.t('statsCopied') : 'Stats copied!');
+        ShareModule.copyStats(state.tokens, model, percent);
+        ShareModule.flashButton(btnCopy);
       });
     }
   }
 
   // ---- URL Params ----
-  function initURLParams() {
-    if (typeof ShareModule === 'undefined') return;
-    const params = ShareModule.parseURLParams();
-    if (params) {
-      state.modelIndex = Math.min(params.modelIndex, CLAUDE_MODELS.length - 1);
-      categories.forEach(cat => {
-        state.tokens[cat] = params.tokens[cat] || 0;
-      });
-    }
+  /**
+   * Check for share URL params. Returns true if params were found and applied.
+   */
+  function loadURLParams() {
+    if (typeof ShareModule === 'undefined') return false;
+    var params = ShareModule.parseURLParams();
+    if (!params) return false;
+
+    state.modelIndex = Math.min(params.modelIndex, CLAUDE_MODELS.length - 1);
+    categories.forEach(function (cat) {
+      state.tokens[cat] = params.tokens[cat] || 0;
+    });
+    state.activePreset = null;
+    return true;
   }
 
   // Run on DOM ready
