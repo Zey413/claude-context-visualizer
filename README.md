@@ -1,6 +1,6 @@
 # Claude Context Window Visualizer
 
-![Version](https://img.shields.io/badge/version-2.0.0-8B5CF6)
+![Version](https://img.shields.io/badge/version-2.1.0-8B5CF6)
 ![HTML](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -18,6 +18,15 @@ Interactive visualization of Claude's context window token usage. Features an an
 </p>
 
 ---
+
+## What's New in v2.1
+
+- **Claude Opus 4.6** & **Sonnet 4.6** — 1M context, latest flagship models
+- **Health Monitor HUD** — always-visible bar with usage ring, cost ticker, danger alerts
+- **Sankey Flow Diagram** — beautiful SVG token lifecycle visualization
+- **Prompt Cache Savings** — see how caching cuts costs by up to 90%
+- **Cost Forecast** — project daily/monthly/yearly costs with budget tracking
+- **Prompt caching pricing** on all models
 
 ## What's New in v2.0
 
@@ -141,11 +150,11 @@ Or visit: **https://zey413.github.io/claude-context-visualizer/**
 
 | Model | Context Window | Output Limit | Tier |
 |-------|---------------|-------------|------|
-| Claude 4 Opus | 200,000 | 32,000 | Flagship |
-| Claude 4 Sonnet | 200,000 | 64,000 | Balanced |
-| Claude 4.5 Opus | 200,000 | 32,000 | Flagship |
-| Claude 4.5 Sonnet | 200,000 | 64,000 | Balanced |
-| Claude 4.5 Sonnet (1M) | 1,000,000 | 64,000 | Extended |
+| Claude Opus 4.6 | 1,000,000 | 128,000 | Flagship |
+| Claude Sonnet 4.6 | 1,000,000 | 64,000 | Balanced |
+| Claude Sonnet 4.5 | 200,000 | 64,000 | Balanced |
+| Claude Opus 4 | 200,000 | 32,000 | Flagship |
+| Claude Sonnet 4 | 200,000 | 64,000 | Balanced |
 | Claude 3.5 Sonnet | 200,000 | 8,192 | Legacy |
 | Claude 3.5 Haiku | 200,000 | 8,192 | Speed |
 | Claude 3 Opus | 200,000 | 4,096 | Legacy |
@@ -174,7 +183,7 @@ Pure client-side -- zero dependencies.
 claude-context-visualizer/
 ├── index.html              # Main entry point
 ├── manifest.json           # PWA manifest
-├── sw.js                   # Service worker (offline cache, v8)
+├── sw.js                   # Service worker (offline cache, v9)
 ├── robots.txt              # Search engine directives
 ├── sitemap.xml             # Sitemap for SEO
 ├── CHANGELOG.md            # Release notes
@@ -190,6 +199,10 @@ claude-context-visualizer/
 │   ├── charts.js           # SVG charts (Pie, Radar, Trend)
 │   ├── memory-tracker.js   # Claude Code memory visualization
 │   ├── stream.js           # Token flow stream animation
+│   ├── health-monitor.js   # Real-time context health HUD
+│   ├── sankey.js           # SVG Sankey flow diagram
+│   ├── cache-viz.js        # Prompt cache savings visualizer
+│   ├── cost-forecast.js    # Cost forecast & budget tracker
 │   └── app.js              # State, sliders, analytics, simulator
 └── assets/
     └── favicon.svg         # App icon

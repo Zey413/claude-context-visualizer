@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-03-31
+
+### Added
+- **Claude Opus 4.6** (1M context, 128K output, $5/$25) — latest flagship model
+- **Claude Sonnet 4.6** (1M context, 64K output, $3/$15) — latest balanced model
+- **Prompt caching pricing** fields on all models (cacheWritePerMTok, cacheReadPerMTok)
+- **Health Monitor HUD** — always-visible compact bar with usage ring, cost ticker, remaining tokens, model badge, danger pulse alert, estimated turns
+- **Sankey Flow Diagram** — pure SVG Sankey showing token lifecycle: input categories merge into context window with curved bezier paths, separate output flow
+- **Prompt Cache Savings Visualizer** — interactive cache hit rate slider, side-by-side cached/uncached cost comparison, savings breakdown table, optimization recommendations
+- **Cost Forecast & Budget Tracker** — daily request projections (per-request → yearly), all-model monthly cost comparison bars, budget progress bar with alerts
+- **v2→v3 localStorage migration** for model indices
+- i18n keys for all new features (EN, ZH-CN, JA)
+
+### Changed
+- Models reorganized by generation (4.6 → 4.5 → 4 → 3.5 → 3)
+- Removed deprecated Claude 4.5 Opus and Claude 4.5 Sonnet (1M) variants
+- Budget planner now recommends 4.6 models for max and large-context scenarios
+- Service worker cache bumped to v9
+- MODEL_DATA_VERSION bumped to 3
+
+### Performance
+- Agent Teams: 4 features built in parallel by independent agents
+- All new modules follow lazy-init pattern
+- Health monitor uses lightweight SVG ring (no canvas overhead)
+- Sankey diagram uses efficient path calculations
+
 ## [2.0.0] - 2026-03-31
 
 ### Added
@@ -84,5 +110,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stray closing brace in CSS removed
 - Null check in gauge `setSegmentColors` and PNG export canvas context
 
+[2.1.0]: https://github.com/Zey413/claude-context-visualizer/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Zey413/claude-context-visualizer/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/Zey413/claude-context-visualizer/releases/tag/v1.0.0

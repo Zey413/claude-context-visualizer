@@ -92,6 +92,14 @@ const I18n = (function () {
       claudeCodeMemory: 'Claude Code Memory',
       sessionSimulator: 'Session Simulator',
       footerDashboard: 'Dashboard',
+
+      // v2.1 — New features
+      healthMonitor: 'Health Monitor',
+      sankeyDiagram: 'Token Flow Diagram',
+      cacheSavings: 'Prompt Cache Savings',
+      costForecast: 'Cost Forecast & Budget',
+      dailyRequests: 'Daily Requests',
+      monthlyBudget: 'Monthly Budget',
     },
 
     'zh-CN': {
@@ -176,6 +184,14 @@ const I18n = (function () {
       claudeCodeMemory: 'Claude Code \u5185\u5B58',
       sessionSimulator: '\u4F1A\u8BDD\u6A21\u62DF\u5668',
       footerDashboard: '\u4EEA\u8868\u76D8',
+
+      // v2.1
+      healthMonitor: '\u5065\u5EB7\u76D1\u63A7',
+      sankeyDiagram: '\u4EE4\u724C\u6D41\u5411\u56FE',
+      cacheSavings: '\u7F13\u5B58\u8282\u7701',
+      costForecast: '\u6210\u672C\u9884\u6D4B\u4E0E\u9884\u7B97',
+      dailyRequests: '\u6BCF\u65E5\u8BF7\u6C42\u6570',
+      monthlyBudget: '\u6708\u5EA6\u9884\u7B97',
     },
 
     ja: {
@@ -260,6 +276,14 @@ const I18n = (function () {
       claudeCodeMemory: 'Claude Code \u30E1\u30E2\u30EA',
       sessionSimulator: '\u30BB\u30C3\u30B7\u30E7\u30F3\u30B7\u30DF\u30E5\u30EC\u30FC\u30BF',
       footerDashboard: '\u30C0\u30C3\u30B7\u30E5\u30DC\u30FC\u30C9',
+
+      // v2.1
+      healthMonitor: '\u30D8\u30EB\u30B9\u30E2\u30CB\u30BF\u30FC',
+      sankeyDiagram: '\u30C8\u30FC\u30AF\u30F3\u30D5\u30ED\u30FC\u56F3',
+      cacheSavings: '\u30AD\u30E3\u30C3\u30B7\u30E5\u7BC0\u7D04',
+      costForecast: '\u30B3\u30B9\u30C8\u4E88\u6E2C\u3068\u4E88\u7B97',
+      dailyRequests: '\u65E5\u6B21\u30EA\u30AF\u30A8\u30B9\u30C8\u6570',
+      monthlyBudget: '\u6708\u4E88\u7B97',
     },
   };
 
