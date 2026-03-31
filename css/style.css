@@ -5667,6 +5667,20 @@ button:focus-visible, select:focus-visible, input:focus-visible {
 .model-heatmap-section--open .estimator-toggle__chevron { transform: rotate(180deg); }
 
 /* =========================================
+   Optimization Advisor Section
+   ========================================= */
+.optimization-advisor-section { contain: layout; }
+.optimization-advisor-section--open .optimization-advisor-body { display: block !important; }
+.optimization-advisor-section--open .estimator-toggle__chevron { transform: rotate(180deg); }
+
+/* =========================================
+   Config Exporter Section
+   ========================================= */
+.config-exporter-section { contain: layout; }
+.config-exporter-section--open .config-exporter-body { display: block !important; }
+.config-exporter-section--open .estimator-toggle__chevron { transform: rotate(180deg); }
+
+/* =========================================
    Mobile & Touch Optimizations
    ========================================= */
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ctx-viz-v12';
+const CACHE_NAME = 'ctx-viz-v13';
 const ASSETS = [
   './',
   './index.html',
@@ -23,6 +23,9 @@ const ASSETS = [
   './js/token-waterfall.js',
   './js/compaction-sim.js',
   './js/model-heatmap.js',
+  './js/optimization-advisor.js',
+  './js/config-exporter.js',
+  './js/guided-tour.js',
   './js/app.js',
   './assets/favicon.svg',
   './manifest.json',

@@ -1238,6 +1238,16 @@
     if (typeof ModelHeatmap !== 'undefined' && ModelHeatmap.isInited && ModelHeatmap.isInited()) {
       ModelHeatmap.update(state.tokens, state.modelIndex);
     }
+
+    // ---- v3.2: Update Optimization Advisor ----
+    if (typeof OptimizationAdvisor !== 'undefined' && OptimizationAdvisor.isInited && OptimizationAdvisor.isInited()) {
+      OptimizationAdvisor.analyze(state.tokens, state.modelIndex, CLAUDE_MODELS[state.modelIndex].contextWindow);
+    }
+
+    // ---- v3.2: Update Config Exporter ----
+    if (typeof ConfigExporter !== 'undefined' && ConfigExporter.isInited && ConfigExporter.isInited()) {
+      ConfigExporter.setData(state.tokens, state.modelIndex);
+    }
   }
 
   // ---- Keyboard Shortcuts ----
@@ -2933,8 +2943,8 @@
     updateSliderMax();
 
     if (!loaded) {
-      // Apply default preset
-      applyPreset(0);
+      // Apply default preset — use "Long Conversation" (index 1) for a more visual demo
+      applyPreset(1);
     } else {
       clampTokens();
       syncSlidersFromState();
@@ -2960,6 +2970,12 @@
     // ---- v3.1: Seed demo data into new modules on first visit ----
     seedDemoDataIfFirstVisit();
 
+    // ---- v3.2: Launch guided tour on first visit ----
+    if (typeof GuidedTour !== 'undefined' && !GuidedTour.isCompleted()) {
+      // Delay tour start so all modules finish rendering
+      setTimeout(function () { GuidedTour.start(); }, 1500);
+    }
+
     // ---- v3.1: Initialize Compaction Simulator ----
     initNewModuleToggle('compaction-sim');
     if (typeof CompactionSim !== 'undefined') {
@@ -2970,6 +2986,18 @@
     initNewModuleToggle('model-heatmap');
     if (typeof ModelHeatmap !== 'undefined') {
       ModelHeatmap.init('model-heatmap-container');
+    }
+
+    // ---- v3.2: Initialize Optimization Advisor ----
+    initNewModuleToggle('optimization-advisor');
+    if (typeof OptimizationAdvisor !== 'undefined') {
+      OptimizationAdvisor.init('optimization-advisor-container');
+    }
+
+    // ---- v3.2: Initialize Config Exporter ----
+    initNewModuleToggle('config-exporter');
+    if (typeof ConfigExporter !== 'undefined') {
+      ConfigExporter.init('config-exporter-container');
     }
   }
 

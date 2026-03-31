@@ -1,6 +1,6 @@
 # Claude Context Window Visualizer
 
-![Version](https://img.shields.io/badge/version-3.1.0-8B5CF6)
+![Version](https://img.shields.io/badge/version-3.2.0-8B5CF6)
 ![HTML](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -11,7 +11,7 @@
 Interactive visualization of Claude's context window token usage. Features an animated SVG donut gauge, **realtime context monitor**, **alert timeline with replay**, **token waterfall analysis**, **context compaction simulator**, **model cost heatmap**, **all-model comparison dashboard**, **advanced charts (Pie/Radar/Trend)**, **Claude Code memory tracker**, **token flow stream animation**, model comparison mode, token estimator, API response parser, analytics panel, conversation simulator, usage timeline, and full internationalization -- all in a zero-dependency PWA with dark glassmorphism UI.
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Claude-Context_Visualizer_v3.1-8B5CF6?style=for-the-badge" alt="Claude Context Visualizer v3.1"/>
+  <img src="https://img.shields.io/badge/Claude-Context_Visualizer_v3.2-8B5CF6?style=for-the-badge" alt="Claude Context Visualizer v3.2"/>
 </p>
 
 <p align="center">
@@ -19,6 +19,13 @@ Interactive visualization of Claude's context window token usage. Features an an
 </p>
 
 ---
+
+## What's New in v3.2
+
+- **Guided Tour** -- 7-step interactive onboarding highlights key features with overlay, auto-scroll, and progress indicators.
+- **Optimization Advisor** -- Smart rule engine analyzes your token allocation and recommends improvements (system prompt size, caching, model selection, tool overhead).
+- **Config Exporter** -- Export current configuration as JSON, YAML, Markdown report, or Claude API snippet with one click.
+- **Better Default Experience** -- First-time visitors now see "Long Conversation" preset (65% usage) instead of empty dashboard.
 
 ## What's New in v3.1
 

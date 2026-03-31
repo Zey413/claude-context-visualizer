@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2026-03-31
+
+### Added
+- **Guided Tour** (`guided-tour.js`) — 7-step interactive onboarding for first-time visitors
+  - Overlay with highlighted elements, step-by-step navigation
+  - Skip/Next/Done controls, progress dots, ESC to dismiss
+  - Auto-scrolls to each feature section
+
+- **Optimization Advisor** (`optimization-advisor.js`) — Smart analysis engine
+  - Analyzes token distribution and suggests improvements
+  - Rules: system prompt size, cache opportunity, model cost, tool overhead
+  - Severity-ranked cards (info/warning/critical) with action buttons
+  - Cost comparison with cheaper model alternatives
+
+- **Config Exporter** (`config-exporter.js`) — Multi-format export
+  - JSON, YAML, Markdown report, Claude API config snippet
+  - Copy-to-clipboard and download-as-file support
+  - Live preview pane with syntax highlighting
+
+### Changed
+- Default preset changed from "Light Chat" to "Long Conversation" for richer first-load experience
+- Footer version updated to v3.2.0
+- Service worker bumped to v13
+
 ## [3.1.0] - 2026-03-31
 
 ### Added
