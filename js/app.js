@@ -1652,16 +1652,15 @@
   function initLangSelector() {
     if (typeof I18n === 'undefined') return;
 
-    // Initialize i18n (detects browser language or loads saved preference)
+    // Initialize i18n (detects browser language or loads saved preference).
+    // I18n.init() internally calls buildLanguageSelector() which attaches
+    // a change listener to #lang-select, so we don't add another one here.
     I18n.init();
 
     const langSelect = document.getElementById('lang-select');
     if (!langSelect) return;
 
     langSelect.value = I18n.getLanguage();
-    langSelect.addEventListener('change', () => {
-      I18n.setLanguage(langSelect.value);
-    });
   }
 
   // ---- Share / Export Buttons ----
