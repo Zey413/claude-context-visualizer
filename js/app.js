@@ -886,6 +886,9 @@
     // Update analytics panel
     updateAnalytics();
 
+    // Update pricing comparison table
+    updatePricingTable();
+
     // Update conversation turns estimate
     updateConversationTurns();
   }
@@ -2044,6 +2047,7 @@
     initCompareMode();
     initEstimator();
     initAnalytics();
+    initPricing();
     initApiParser();
     initReplay();
     initTheme();

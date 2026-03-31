@@ -3050,7 +3050,8 @@ body {
 
   /* Collapsible panels: show title only, hide body */
   .estimator-body,
-  .analytics-body {
+  .analytics-body,
+  .pricing-body {
     display: none !important;
   }
 
