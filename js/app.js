@@ -506,6 +506,10 @@
     initSliders();
     initKeyboard();
     initCompareMode();
+    initTheme();
+    initLangSelector();
+    initShareButtons();
+    initURLParams();
 
     const loaded = load();
     modelSelect.value = state.modelIndex;
@@ -528,6 +532,100 @@
 
     // Restore timeline
     renderTimeline();
+
+    // Apply i18n
+    if (typeof I18n !== 'undefined') {
+      I18n.applyTranslations();
+    }
+  }
+
+  // ---- Theme Toggle ----
+  function initTheme() {
+    const btn = document.getElementById('theme-toggle');
+    const darkIcon = btn.querySelector('.theme-icon--dark');
+    const lightIcon = btn.querySelector('.theme-icon--light');
+
+    // Load saved theme
+    const saved = localStorage.getItem('claude-ctx-theme');
+    if (saved === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      darkIcon.style.display = 'none';
+      lightIcon.style.display = 'block';
+    }
+
+    btn.addEventListener('click', () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      if (isLight) {
+        document.documentElement.removeAttribute('data-theme');
+        darkIcon.style.display = 'block';
+        lightIcon.style.display = 'none';
+        localStorage.setItem('claude-ctx-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        darkIcon.style.display = 'none';
+        lightIcon.style.display = 'block';
+        localStorage.setItem('claude-ctx-theme', 'light');
+      }
+    });
+  }
+
+  // ---- Language Selector ----
+  function initLangSelector() {
+    const langSelect = document.getElementById('lang-select');
+    if (!langSelect || typeof I18N === 'undefined') return;
+
+    langSelect.value = I18n.currentLang;
+    langSelect.addEventListener('change', () => {
+      I18n.setLang(langSelect.value);
+    });
+  }
+
+  // ---- Share / Export Buttons ----
+  function initShareButtons() {
+    if (typeof ShareModule === 'undefined') return;
+
+    const btnExport = document.getElementById('btn-export-png');
+    const btnShare = document.getElementById('btn-share-link');
+    const btnCopy = document.getElementById('btn-copy-stats');
+
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
+        const model = CLAUDE_MODELS[state.modelIndex];
+        const total = categories.reduce((s, c) => s + state.tokens[c], 0);
+        const percent = model.contextWindow > 0 ? (total / model.contextWindow) * 100 : 0;
+        ShareModule.exportPNG(state.tokens, model, percent);
+        ShareModule.showToast(typeof I18n !== 'undefined' ? I18n.t('pngExported') : 'PNG exported!');
+      });
+    }
+
+    if (btnShare) {
+      btnShare.addEventListener('click', async () => {
+        await ShareModule.copyShareLink(state.modelIndex, state.tokens);
+        ShareModule.showToast(typeof I18n !== 'undefined' ? I18n.t('linkCopied') : 'Share link copied!');
+      });
+    }
+
+    if (btnCopy) {
+      btnCopy.addEventListener('click', async () => {
+        const model = CLAUDE_MODELS[state.modelIndex];
+        const total = categories.reduce((s, c) => s + state.tokens[c], 0);
+        const percent = model.contextWindow > 0 ? (total / model.contextWindow) * 100 : 0;
+        await ShareModule.copyStats(state.tokens, model, percent);
+        ShareModule.showToast(typeof I18n !== 'undefined' ? I18n.t('statsCopied') : 'Stats copied!');
+      });
+    }
+  }
+
+  // ---- URL Params ----
+  function initURLParams() {
+    if (typeof ShareModule === 'undefined') return;
+    const params = ShareModule.parseURLParams();
+    if (params) {
+      state.modelIndex = Math.min(params.modelIndex, CLAUDE_MODELS.length - 1);
+      categories.forEach(cat => {
+        state.tokens[cat] = params.tokens[cat] || 0;
+      });
+    }
   }
 
   // Run on DOM ready

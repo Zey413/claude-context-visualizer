@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +9,10 @@
 </head>
 <body>
   <!-- Background effects -->
-  <canvas id="particle-canvas" class="particle-canvas"></canvas>
-  <div class="bg-noise"></div>
-  <div class="bg-glow bg-glow--1"></div>
-  <div class="bg-glow bg-glow--2"></div>
+  <canvas id="particle-canvas" class="particle-canvas" aria-hidden="true"></canvas>
+  <div class="bg-noise" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--1" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--2" aria-hidden="true"></div>
 
   <div class="app">
     <!-- Header -->
@@ -37,18 +37,34 @@
         </div>
       </div>
       <div class="header__controls">
-        <button id="compare-toggle" class="compare-btn" title="Toggle model comparison mode">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button id="theme-toggle" class="theme-toggle" title="Toggle light/dark theme" aria-label="Toggle light/dark theme">
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+        <button id="compare-toggle" class="compare-btn" title="Toggle model comparison mode" aria-label="Compare" aria-pressed="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="2" y="3" width="8" height="18" rx="2"/>
             <rect x="14" y="3" width="8" height="18" rx="2"/>
           </svg>
           <span>Compare</span>
         </button>
         <div class="select-wrapper">
-          <select id="model-select" class="model-select">
+          <select id="model-select" class="model-select" aria-label="Select Claude model">
             <!-- Populated by JS -->
           </select>
-          <span class="select-arrow">▾</span>
+          <span class="select-arrow" aria-hidden="true">▾</span>
         </div>
       </div>
     </header>
@@ -56,88 +72,113 @@
     <!-- Main content -->
     <main class="main">
       <!-- Left: Gauge(s) -->
-      <section class="gauge-section" id="gauge-section">
+      <section class="gauge-section" id="gauge-section" aria-label="Token usage gauge">
         <div class="gauge-card glass-card" id="gauge-card-primary">
           <div class="gauge-card__model-label" id="gauge-label-primary"></div>
-          <div id="gauge-container" class="gauge-container">
+          <div id="gauge-container" class="gauge-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Context window usage percentage">
             <!-- SVG gauge rendered by JS -->
           </div>
-          <div class="gauge-status" id="gauge-status">
-            <span class="gauge-status__dot"></span>
+          <div class="gauge-status" id="gauge-status" aria-live="polite" aria-atomic="true">
+            <span class="gauge-status__dot" aria-hidden="true"></span>
             <span class="gauge-status__text">Normal</span>
+          </div>
+          <!-- Export & Share Action Bar -->
+          <div class="action-bar" id="action-bar">
+            <button class="action-btn" id="btn-export-png" title="Export gauge as PNG image" aria-label="Export gauge as PNG image">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Export PNG</span>
+            </button>
+            <button class="action-btn" id="btn-share-link" title="Copy shareable URL to clipboard" aria-label="Copy shareable URL to clipboard">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+              <span>Share Link</span>
+            </button>
+            <button class="action-btn" id="btn-copy-stats" title="Copy usage stats to clipboard" aria-label="Copy usage stats to clipboard">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              <span>Copy Stats</span>
+            </button>
           </div>
         </div>
         <!-- Secondary gauge for comparison mode (hidden by default) -->
         <div class="gauge-card glass-card gauge-card--compare" id="gauge-card-compare" style="display:none;">
           <div class="gauge-card__model-label" id="gauge-label-compare"></div>
-          <div id="gauge-container-compare" class="gauge-container">
+          <div id="gauge-container-compare" class="gauge-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Comparison model context window usage percentage">
             <!-- SVG gauge rendered by JS in compare mode -->
           </div>
-          <div class="gauge-status" id="gauge-status-compare">
-            <span class="gauge-status__dot"></span>
+          <div class="gauge-status" id="gauge-status-compare" aria-live="polite" aria-atomic="true">
+            <span class="gauge-status__dot" aria-hidden="true"></span>
             <span class="gauge-status__text">Normal</span>
           </div>
           <div class="compare-model-select-wrapper">
             <div class="select-wrapper">
-              <select id="compare-model-select" class="model-select model-select--compare">
+              <select id="compare-model-select" class="model-select model-select--compare" aria-label="Select comparison model">
                 <!-- Populated by JS -->
               </select>
-              <span class="select-arrow">▾</span>
+              <span class="select-arrow" aria-hidden="true">▾</span>
             </div>
           </div>
         </div>
       </section>
 
       <!-- Right: Controls -->
-      <section class="controls-section">
+      <section class="controls-section" aria-label="Token allocation controls">
         <!-- Token Breakdown Cards -->
-        <div class="breakdown-grid">
+        <div class="breakdown-grid" role="region" aria-label="Token breakdown">
           <div class="token-card glass-card" data-category="system">
             <div class="token-card__header">
-              <span class="token-card__icon">⚙️</span>
+              <span class="token-card__icon" aria-hidden="true">⚙️</span>
               <span class="token-card__label">System Prompt</span>
             </div>
             <div class="token-card__value" id="system-value">0</div>
-            <div class="token-card__bar">
+            <div class="token-card__bar" role="meter" aria-label="System prompt usage" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
               <div class="token-card__bar-fill" id="system-bar" style="--cat-color: #8B5CF6"></div>
             </div>
-            <div class="token-card__percent" id="system-percent">0%</div>
+            <div class="token-card__percent" id="system-percent" aria-live="polite">0%</div>
           </div>
 
           <div class="token-card glass-card" data-category="user">
             <div class="token-card__header">
-              <span class="token-card__icon">👤</span>
+              <span class="token-card__icon" aria-hidden="true">👤</span>
               <span class="token-card__label">User Messages</span>
             </div>
             <div class="token-card__value" id="user-value">0</div>
-            <div class="token-card__bar">
+            <div class="token-card__bar" role="meter" aria-label="User messages usage" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
               <div class="token-card__bar-fill" id="user-bar" style="--cat-color: #3B82F6"></div>
             </div>
-            <div class="token-card__percent" id="user-percent">0%</div>
+            <div class="token-card__percent" id="user-percent" aria-live="polite">0%</div>
           </div>
 
           <div class="token-card glass-card" data-category="assistant">
             <div class="token-card__header">
-              <span class="token-card__icon">🤖</span>
+              <span class="token-card__icon" aria-hidden="true">🤖</span>
               <span class="token-card__label">Assistant Output</span>
             </div>
             <div class="token-card__value" id="assistant-value">0</div>
-            <div class="token-card__bar">
+            <div class="token-card__bar" role="meter" aria-label="Assistant output usage" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
               <div class="token-card__bar-fill" id="assistant-bar" style="--cat-color: #10B981"></div>
             </div>
-            <div class="token-card__percent" id="assistant-percent">0%</div>
+            <div class="token-card__percent" id="assistant-percent" aria-live="polite">0%</div>
           </div>
 
           <div class="token-card glass-card" data-category="tools">
             <div class="token-card__header">
-              <span class="token-card__icon">🔧</span>
+              <span class="token-card__icon" aria-hidden="true">🔧</span>
               <span class="token-card__label">Tool Use</span>
             </div>
             <div class="token-card__value" id="tools-value">0</div>
-            <div class="token-card__bar">
+            <div class="token-card__bar" role="meter" aria-label="Tool use usage" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
               <div class="token-card__bar-fill" id="tools-bar" style="--cat-color: #F59E0B"></div>
             </div>
-            <div class="token-card__percent" id="tools-percent">0%</div>
+            <div class="token-card__percent" id="tools-percent" aria-live="polite">0%</div>
           </div>
         </div>
 
@@ -146,50 +187,50 @@
           <h3 class="sliders-card__title">Adjust Token Allocation</h3>
 
           <div class="slider-row" data-category="system">
-            <label class="slider-label">
-              <span class="slider-label__dot" style="background: #8B5CF6"></span>
+            <label class="slider-label" for="slider-system">
+              <span class="slider-label__dot" style="background: #8B5CF6" aria-hidden="true"></span>
               System
             </label>
             <input type="range" id="slider-system" class="token-slider" min="0" max="100" value="0"
-              style="--slider-color: #8B5CF6">
-            <input type="number" id="input-system" class="token-input" value="0" min="0">
+              style="--slider-color: #8B5CF6" aria-label="System prompt tokens">
+            <input type="number" id="input-system" class="token-input" value="0" min="0" aria-label="System prompt token count">
           </div>
 
           <div class="slider-row" data-category="user">
-            <label class="slider-label">
-              <span class="slider-label__dot" style="background: #3B82F6"></span>
+            <label class="slider-label" for="slider-user">
+              <span class="slider-label__dot" style="background: #3B82F6" aria-hidden="true"></span>
               User
             </label>
             <input type="range" id="slider-user" class="token-slider" min="0" max="100" value="0"
-              style="--slider-color: #3B82F6">
-            <input type="number" id="input-user" class="token-input" value="0" min="0">
+              style="--slider-color: #3B82F6" aria-label="User messages tokens">
+            <input type="number" id="input-user" class="token-input" value="0" min="0" aria-label="User messages token count">
           </div>
 
           <div class="slider-row" data-category="assistant">
-            <label class="slider-label">
-              <span class="slider-label__dot" style="background: #10B981"></span>
+            <label class="slider-label" for="slider-assistant">
+              <span class="slider-label__dot" style="background: #10B981" aria-hidden="true"></span>
               Assistant
             </label>
             <input type="range" id="slider-assistant" class="token-slider" min="0" max="100" value="0"
-              style="--slider-color: #10B981">
-            <input type="number" id="input-assistant" class="token-input" value="0" min="0">
+              style="--slider-color: #10B981" aria-label="Assistant output tokens">
+            <input type="number" id="input-assistant" class="token-input" value="0" min="0" aria-label="Assistant output token count">
           </div>
 
           <div class="slider-row" data-category="tools">
-            <label class="slider-label">
-              <span class="slider-label__dot" style="background: #F59E0B"></span>
+            <label class="slider-label" for="slider-tools">
+              <span class="slider-label__dot" style="background: #F59E0B" aria-hidden="true"></span>
               Tools
             </label>
             <input type="range" id="slider-tools" class="token-slider" min="0" max="100" value="0"
-              style="--slider-color: #F59E0B">
-            <input type="number" id="input-tools" class="token-input" value="0" min="0">
+              style="--slider-color: #F59E0B" aria-label="Tool use tokens">
+            <input type="number" id="input-tools" class="token-input" value="0" min="0" aria-label="Tool use token count">
           </div>
         </div>
 
         <!-- Presets -->
         <div class="presets-card glass-card">
           <h3 class="presets-card__title">Quick Presets</h3>
-          <div class="presets-grid" id="presets-grid">
+          <div class="presets-grid" id="presets-grid" role="group" aria-label="Quick presets">
             <!-- Populated by JS -->
           </div>
         </div>
@@ -197,14 +238,14 @@
     </main>
 
     <!-- Stats Summary Bar -->
-    <section class="stats-bar glass-card">
+    <section class="stats-bar glass-card" aria-label="Usage statistics summary">
       <div class="stat-item">
         <span class="stat-item__label">Total Used</span>
-        <span class="stat-item__value" id="stat-total-used">0</span>
+        <span class="stat-item__value" id="stat-total-used" aria-live="polite">0</span>
       </div>
       <div class="stat-item">
         <span class="stat-item__label">Remaining</span>
-        <span class="stat-item__value stat-item__value--remaining" id="stat-remaining">0</span>
+        <span class="stat-item__value stat-item__value--remaining" id="stat-remaining" aria-live="polite">0</span>
       </div>
       <div class="stat-item">
         <span class="stat-item__label">Context Window</span>
@@ -217,15 +258,15 @@
     </section>
 
     <!-- Usage Timeline -->
-    <section class="timeline-section glass-card" id="timeline-section">
+    <section class="timeline-section glass-card" id="timeline-section" aria-label="Usage timeline">
       <div class="timeline-header">
         <h3 class="timeline-title">Usage Timeline</h3>
-        <span class="timeline-subtitle" id="timeline-count">0 / 10 snapshots</span>
+        <span class="timeline-subtitle" id="timeline-count" aria-live="polite">0 / 10 snapshots</span>
       </div>
-      <div class="timeline-chart" id="timeline-chart">
+      <div class="timeline-chart" id="timeline-chart" role="img" aria-label="Token usage timeline chart">
         <div class="timeline-empty">Adjust sliders to record snapshots</div>
       </div>
-      <div class="timeline-axis">
+      <div class="timeline-axis" aria-hidden="true">
         <span>Oldest</span>
         <span>Latest</span>
       </div>
@@ -233,15 +274,24 @@
 
     <!-- Footer -->
     <footer class="footer">
+      <div class="footer__controls">
+        <select id="lang-select" class="lang-select" aria-label="Select language">
+          <option value="en">EN</option>
+          <option value="zh-CN">中文</option>
+          <option value="ja">日本語</option>
+        </select>
+      </div>
       <p>Built with ✨ by <a href="https://github.com/Zey413" target="_blank" rel="noopener">@Zey413</a></p>
-      <p class="footer__hint">Keyboard: <kbd>R</kbd> Reset &middot; <kbd>1</kbd>-<kbd>4</kbd> Presets &middot; <kbd>C</kbd> Compare</p>
+      <p class="footer__hint">Keyboard: <kbd>R</kbd> Reset &middot; <kbd>1</kbd>-<kbd>4</kbd> Presets &middot; <kbd>C</kbd> Compare &middot; <kbd>T</kbd> Theme</p>
     </footer>
   </div>
 
   <!-- Scripts in dependency order -->
   <script src="js/models.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/gauge.js"></script>
   <script src="js/particles.js"></script>
+  <script src="js/share.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
