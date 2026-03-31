@@ -4,6 +4,8 @@
  * No external dependencies — uses native Canvas API and Clipboard API.
  */
 
+'use strict';
+
 const ShareModule = {
 
   // ---- Helper: rounded rectangle path ----

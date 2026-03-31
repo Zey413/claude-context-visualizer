@@ -4,6 +4,8 @@
  * Max 50 particles. Particles turn red and speed up when usage > 80%.
  */
 
+'use strict';
+
 class ParticleSystem {
   constructor() {
     this.canvas = document.getElementById('particle-canvas');
@@ -11,9 +13,12 @@ class ParticleSystem {
 
     this.ctx = this.canvas.getContext('2d');
     this.particles = [];
-    this.maxParticles = 50;
     this.usagePercent = 0;
     this.running = false;
+
+    // Reduce particle count on mobile for better performance
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    this.maxParticles = isMobile ? 30 : 50;
 
     // Base colors for normal state (purples and blues matching the theme)
     this.normalColors = [
@@ -26,10 +31,25 @@ class ParticleSystem {
     // Danger color
     this.dangerColor = { r: 239, g: 68, b: 68 }; // red
 
+    // Pre-computed frame color (single color for all particle glows per frame)
+    this._frameR = 139;
+    this._frameG = 92;
+    this._frameB = 246;
+
     this._resize();
     this._initParticles();
 
     window.addEventListener('resize', () => this._resize());
+
+    // Visibility API: pause particles when tab is not visible
+    this._onVisibilityChange = () => {
+      if (document.hidden) {
+        this.stop();
+      } else if (!this.running) {
+        this.start();
+      }
+    };
+    document.addEventListener('visibilitychange', this._onVisibilityChange);
   }
 
   _resize() {

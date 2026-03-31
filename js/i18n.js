@@ -263,10 +263,14 @@ const I18n = (function () {
    * Initialize i18n: load saved preference or detect browser language.
    */
   function init() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && translations[saved]) {
-      currentLang = saved;
-    } else {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved && translations[saved]) {
+        currentLang = saved;
+      } else {
+        currentLang = detectLanguage();
+      }
+    } catch (e) {
       currentLang = detectLanguage();
     }
     applyTranslations();
@@ -287,7 +291,7 @@ const I18n = (function () {
   function setLanguage(lang) {
     if (!translations[lang]) return;
     currentLang = lang;
-    localStorage.setItem(STORAGE_KEY, lang);
+    try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) { /* ignore */ }
     applyTranslations();
     updateLanguageSelector();
   }

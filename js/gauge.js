@@ -3,9 +3,15 @@
  * Renders an animated donut chart with color-coded segments.
  */
 
+'use strict';
+
 class GaugeRenderer {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
+    if (!this.container) {
+      console.warn('GaugeRenderer: container #' + containerId + ' not found');
+      return;
+    }
     this.size = 360;
     this.cx = this.size / 2;
     this.cy = this.size / 2;
@@ -174,6 +180,7 @@ class GaugeRenderer {
    * Update the gauge with new segment values (token counts) and total context window.
    */
   update(tokens, contextWindow) {
+    if (!this.container) return;
     const total = tokens.system + tokens.user + tokens.assistant + tokens.tools;
     const percent = contextWindow > 0 ? (total / contextWindow) * 100 : 0;
 

@@ -3,6 +3,8 @@
  * Defines Claude models, token categories, color schemes, and usage presets.
  */
 
+'use strict';
+
 const CLAUDE_MODELS = [
   {
     id: 'claude-4-opus-1m',

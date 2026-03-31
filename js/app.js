@@ -36,6 +36,21 @@
   // Track previous efficiency score label for confetti trigger
   let _prevScoreLabel = '';
 
+  // rAF-based throttle: coalesce rapid slider events into one render per frame
+  let _renderRAF = null;
+  function scheduleRender() {
+    if (_renderRAF) return; // already scheduled for this frame
+    _renderRAF = requestAnimationFrame(() => {
+      _renderRAF = null;
+      render();
+    });
+  }
+
+  // Lazy-init flags for collapsible panels
+  let _estimatorInited = false;
+  let _analyticsInited = false;
+  let _apiParserInited = false;
+
   // ---- Smooth Number Counter Animation ----
   const _activeAnimations = {};
 
@@ -121,7 +136,9 @@
   // ---- Welcome Onboarding Tooltip ----
   function initOnboardingTooltip() {
     var ONBOARD_KEY = 'claude-ctx-onboarded';
-    if (localStorage.getItem(ONBOARD_KEY)) return;
+    try {
+      if (localStorage.getItem(ONBOARD_KEY)) return;
+    } catch (e) { return; }
 
     var tooltip = document.createElement('div');
     tooltip.className = 'onboarding-tooltip';
@@ -140,15 +157,21 @@
     void tooltip.offsetWidth;
     tooltip.classList.add('onboarding-tooltip--visible');
 
+    var _onboardDismissed = false;
     function dismiss() {
+      if (_onboardDismissed) return;
+      _onboardDismissed = true;
       tooltip.classList.remove('onboarding-tooltip--visible');
-      localStorage.setItem(ONBOARD_KEY, '1');
+      try { localStorage.setItem(ONBOARD_KEY, '1'); } catch (e) { /* ignore */ }
       setTimeout(function () {
         if (tooltip.parentNode) tooltip.parentNode.removeChild(tooltip);
       }, 300);
     }
 
-    document.getElementById('onboarding-dismiss').addEventListener('click', dismiss);
+    var dismissBtn = document.getElementById('onboarding-dismiss');
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', dismiss);
+    }
 
     // Auto-dismiss after 8 seconds
     setTimeout(dismiss, 8000);
@@ -430,7 +453,7 @@
         inputs[cat].value = state.tokens[cat];
         state.activePreset = null;
         pushTimelineSnapshot();
-        render();
+        scheduleRender();
         save();
       });
 
@@ -442,7 +465,7 @@
         sliders[cat].value = state.tokens[cat];
         state.activePreset = null;
         pushTimelineSnapshot();
-        render();
+        scheduleRender();
         save();
       });
 
@@ -921,6 +944,12 @@
     toggle.addEventListener('click', () => {
       const isOpen = card.classList.toggle('analytics-card--open');
       toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+      // Lazy init: update analytics content on first open
+      if (isOpen && !_analyticsInited) {
+        _analyticsInited = true;
+        updateAnalytics();
+      }
     });
   }
 
@@ -1030,6 +1059,9 @@
    * Update the analytics panel with current state.
    */
   function updateAnalytics() {
+    // Skip if analytics panel hasn't been opened yet (lazy init)
+    if (!_analyticsInited) return;
+
     const model = CLAUDE_MODELS[state.modelIndex];
 
     // Efficiency score
@@ -1126,19 +1158,28 @@
   function initEstimator() {
     const toggle = document.getElementById('estimator-toggle');
     const card = document.getElementById('estimator-card');
+
+    if (!toggle || !card) return;
+
+    // Only wire up the toggle; defer full init until first open
+    toggle.addEventListener('click', () => {
+      const isOpen = card.classList.toggle('estimator-card--open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+      // Lazy init: build chips and bind textarea events on first open
+      if (isOpen && !_estimatorInited) {
+        _estimatorInited = true;
+        _initEstimatorBody();
+      }
+    });
+  }
+
+  function _initEstimatorBody() {
     const textarea = document.getElementById('estimator-textarea');
     const countEl = document.getElementById('estimator-count');
     const addBtn = document.getElementById('estimator-add-btn');
     const addTarget = document.getElementById('estimator-add-target');
     const chipsContainer = document.getElementById('estimator-chips');
-
-    if (!toggle || !card) return;
-
-    // Collapsible toggle
-    toggle.addEventListener('click', () => {
-      const isOpen = card.classList.toggle('estimator-card--open');
-      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    });
 
     // Live token estimation from textarea
     let _estimateDebounce = null;
@@ -1181,20 +1222,29 @@
   function initApiParser() {
     const toggle = document.getElementById('api-parser-toggle');
     const card = document.getElementById('api-parser-card');
+
+    if (!toggle || !card) return;
+
+    // Only wire up the toggle; defer full init until first open
+    toggle.addEventListener('click', () => {
+      const isOpen = card.classList.toggle('api-parser-card--open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+      // Lazy init: bind parse/clear/apply/simulate buttons on first open
+      if (isOpen && !_apiParserInited) {
+        _apiParserInited = true;
+        _initApiParserBody();
+      }
+    });
+  }
+
+  function _initApiParserBody() {
     const textarea = document.getElementById('api-response-textarea');
     const parseBtn = document.getElementById('api-parse-btn');
     const clearBtn = document.getElementById('api-clear-btn');
     const applyBtn = document.getElementById('api-apply-btn');
     const simulateBtn = document.getElementById('api-simulate-btn');
     const stopBtn = document.getElementById('api-simulate-stop-btn');
-
-    if (!toggle || !card) return;
-
-    // Collapsible toggle
-    toggle.addEventListener('click', () => {
-      const isOpen = card.classList.toggle('api-parser-card--open');
-      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    });
 
     // Parse button
     parseBtn.addEventListener('click', () => {
@@ -1567,10 +1617,10 @@
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
     if (isLight) {
       document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('claude-ctx-theme', 'dark');
+      try { localStorage.setItem('claude-ctx-theme', 'dark'); } catch (e) { /* ignore */ }
     } else {
       document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('claude-ctx-theme', 'light');
+      try { localStorage.setItem('claude-ctx-theme', 'light'); } catch (e) { /* ignore */ }
     }
   }
 
@@ -1579,10 +1629,12 @@
     if (!btn) return;
 
     // Load saved theme
-    const saved = localStorage.getItem('claude-ctx-theme');
-    if (saved === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
+    try {
+      const saved = localStorage.getItem('claude-ctx-theme');
+      if (saved === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    } catch (e) { /* ignore */ }
 
     btn.addEventListener('click', toggleTheme);
   }
