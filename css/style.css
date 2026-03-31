@@ -2394,3 +2394,206 @@ body {
 :root[data-theme="light"] .theme-toggle .icon-sun {
   display: block;
 }
+
+/* --- Onboarding Tooltip --- */
+.onboarding-tooltip {
+  position: absolute;
+  bottom: 20px;
+  right: -12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.onboarding-tooltip--visible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.onboarding-tooltip__text {
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.onboarding-tooltip__btn {
+  padding: 4px 12px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--accent-purple);
+  font-size: 0.7rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.onboarding-tooltip__btn:hover {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+/* --- Confetti Effect --- */
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.confetti-dot {
+  position: absolute;
+  top: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  opacity: 0;
+  animation: confettiFall 1.5s ease-out forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* --- Print Stylesheet --- */
+@media print {
+  /* White background, remove decorative layers */
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .particle-canvas,
+  .bg-noise,
+  .bg-glow,
+  .bg-glow--1,
+  .bg-glow--2,
+  .confetti-container,
+  .onboarding-tooltip {
+    display: none !important;
+  }
+
+  /* Hide action buttons & interactive controls */
+  .action-bar,
+  .header__controls,
+  .footer__controls,
+  .compare-btn,
+  .theme-toggle,
+  .presets-card,
+  .sliders-card,
+  .action-toast,
+  .share-toast {
+    display: none !important;
+  }
+
+  /* Glass cards become solid white */
+  .glass-card {
+    background: #fff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+  }
+
+  /* Gauge readable in print */
+  .gauge-container {
+    max-width: 240px;
+  }
+
+  .gauge-center-percent {
+    fill: #000 !important;
+  }
+
+  .gauge-center-label,
+  .gauge-center-tokens {
+    fill: #333 !important;
+  }
+
+  /* Stats bar legible */
+  .stat-item__label {
+    color: #666 !important;
+  }
+
+  .stat-item__value {
+    color: #000 !important;
+  }
+
+  .stat-item__value--remaining {
+    color: #059669 !important;
+  }
+
+  /* Token cards readable */
+  .token-card__label {
+    color: #555 !important;
+  }
+
+  .token-card__value {
+    color: #000 !important;
+  }
+
+  /* Collapsible panels: show title only, hide body */
+  .estimator-body,
+  .analytics-body {
+    display: none !important;
+  }
+
+  .estimator-toggle,
+  .analytics-card .estimator-toggle {
+    pointer-events: none;
+  }
+
+  .estimator-toggle__chevron {
+    display: none !important;
+  }
+
+  /* Timeline section: keep visible */
+  .timeline-section {
+    break-inside: avoid;
+  }
+
+  /* Footer simplified */
+  .footer {
+    color: #666 !important;
+  }
+
+  .footer a {
+    color: #333 !important;
+  }
+
+  .footer__hint {
+    display: none !important;
+  }
+
+  /* Disable animations */
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
