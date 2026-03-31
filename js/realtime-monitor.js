@@ -946,6 +946,7 @@
   window.RealtimeMonitor = {
     init: init,
     update: update,
+    isInited: function () { return _inited; },
     startSimulation: startSimulation,
     stopSimulation: stopSimulation,
     parseContextOutput: parseContextOutput,

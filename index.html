@@ -21,6 +21,9 @@
   <link rel="apple-touch-icon" href="assets/favicon.svg">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B5CF6">
+  <!-- Performance: DNS prefetch & preconnect for external origins -->
+  <link rel="dns-prefetch" href="https://zey413.github.io">
+  <link rel="preconnect" href="https://zey413.github.io" crossorigin>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -1047,25 +1050,25 @@
     </footer>
   </div>
 
-  <!-- Scripts in dependency order -->
+  <!-- Scripts in dependency order: models.js loads first (no defer), rest deferred -->
   <script src="js/models.js"></script>
-  <script src="js/i18n.js"></script>
-  <script src="js/gauge.js"></script>
-  <script src="js/particles.js"></script>
-  <script src="js/share.js"></script>
-  <script src="js/dashboard.js"></script>
-  <script src="js/charts.js"></script>
-  <script src="js/memory-tracker.js"></script>
-  <script src="js/stream.js"></script>
-  <script src="js/health-monitor.js"></script>
-  <script src="js/sankey.js"></script>
-  <script src="js/cache-viz.js"></script>
-  <script src="js/cost-forecast.js"></script>
-  <script src="js/scroll-fx.js"></script>
-  <script src="js/realtime-monitor.js"></script>
-  <script src="js/alert-timeline.js"></script>
-  <script src="js/token-waterfall.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/gauge.js" defer></script>
+  <script src="js/particles.js" defer></script>
+  <script src="js/share.js" defer></script>
+  <script src="js/dashboard.js" defer></script>
+  <script src="js/charts.js" defer></script>
+  <script src="js/memory-tracker.js" defer></script>
+  <script src="js/stream.js" defer></script>
+  <script src="js/health-monitor.js" defer></script>
+  <script src="js/sankey.js" defer></script>
+  <script src="js/cache-viz.js" defer></script>
+  <script src="js/cost-forecast.js" defer></script>
+  <script src="js/scroll-fx.js" defer></script>
+  <script src="js/realtime-monitor.js" defer></script>
+  <script src="js/alert-timeline.js" defer></script>
+  <script src="js/token-waterfall.js" defer></script>
+  <script src="js/app.js" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(function() { /* ignore */ });

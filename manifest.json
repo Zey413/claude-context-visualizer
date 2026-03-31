@@ -1,7 +1,8 @@
 {
   "name": "Claude Context Window Visualizer",
   "short_name": "CtxViz",
-  "description": "Interactive visualization of Claude's context window token usage — v2.0 with dashboard, advanced charts, memory tracker, token flow stream, model comparison, analytics, and cost estimates",
+  "version": "3.0.0",
+  "description": "Interactive visualization of Claude's context window token usage — v3.0 with realtime context monitor, alert timeline, token waterfall analysis, prompt cache savings, cost forecast, conversation replay, dashboard, advanced charts, memory tracker, token flow stream, model comparison, analytics, and cost estimates",
   "start_url": ".",
   "display": "standalone",
   "orientation": "any",

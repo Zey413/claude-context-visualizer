@@ -1267,6 +1267,7 @@ var AlertTimeline = (function () {
 
   return {
     init: init,
+    isInited: function () { return _inited; },
     addDataPoint: addDataPoint,
     startReplay: startReplay,
     pauseReplay: pauseReplay,
