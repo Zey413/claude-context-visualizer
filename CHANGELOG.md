@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-03-31
+
+### Fixed
+- CacheViz parameter mismatch (passed model object instead of modelIndex)
+- SankeyDiagram missing `isInited()` in public API
+- 40+ missing CSS classes for CacheViz module (slider, comparison, breakdown, recommendation)
+
+### Added
+- **Scroll entrance animations** — IntersectionObserver-based fade-in with staggered delays
+- **Button press feedback** — 0.96x scale on mousedown for tactile feel
+- **Card hover lift** — translateY(-2px) with purple shadow on glass cards
+- **Chevron rotation** — 180deg animated rotation on collapsible section open/close
+- **Focus-visible rings** — purple outline on all interactive elements for accessibility
+- **Preset hover glow** — subtle purple shadow on hover
+- **Progress bar transitions** — smooth width animations on token bars
+- **prefers-reduced-motion** support — all animations disabled for accessibility
+- New `js/scroll-fx.js` module (auto-initializes)
+
+### Changed
+- Service worker cache bumped to v10
+
 ## [2.1.0] - 2026-03-31
 
 ### Added
@@ -110,6 +131,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stray closing brace in CSS removed
 - Null check in gauge `setSegmentColors` and PNG export canvas context
 
+[2.2.0]: https://github.com/Zey413/claude-context-visualizer/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/Zey413/claude-context-visualizer/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/Zey413/claude-context-visualizer/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/Zey413/claude-context-visualizer/releases/tag/v1.0.0

@@ -1,6 +1,6 @@
 # Claude Context Window Visualizer
 
-![Version](https://img.shields.io/badge/version-2.1.0-8B5CF6)
+![Version](https://img.shields.io/badge/version-2.2.0-8B5CF6)
 ![HTML](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
@@ -18,6 +18,14 @@ Interactive visualization of Claude's context window token usage. Features an an
 </p>
 
 ---
+
+## What's New in v2.2
+
+- **3 critical bug fixes** from comprehensive audit
+- **Scroll entrance animations** — cards fade in as you scroll
+- **Micro-interaction polish** — button press feedback, card hover lift, chevron rotation
+- **Focus-visible accessibility** — purple outline rings on all interactive elements
+- **prefers-reduced-motion** — all animations respect accessibility preferences
 
 ## What's New in v2.1
 
@@ -183,7 +191,7 @@ Pure client-side -- zero dependencies.
 claude-context-visualizer/
 ├── index.html              # Main entry point
 ├── manifest.json           # PWA manifest
-├── sw.js                   # Service worker (offline cache, v9)
+├── sw.js                   # Service worker (offline cache, v10)
 ├── robots.txt              # Search engine directives
 ├── sitemap.xml             # Sitemap for SEO
 ├── CHANGELOG.md            # Release notes
@@ -203,6 +211,7 @@ claude-context-visualizer/
 │   ├── sankey.js           # SVG Sankey flow diagram
 │   ├── cache-viz.js        # Prompt cache savings visualizer
 │   ├── cost-forecast.js    # Cost forecast & budget tracker
+│   ├── scroll-fx.js        # Scroll animations & micro-interactions
 │   └── app.js              # State, sliders, analytics, simulator
 └── assets/
     └── favicon.svg         # App icon
