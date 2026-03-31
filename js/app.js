@@ -796,6 +796,9 @@
 
     // Update analytics panel
     updateAnalytics();
+
+    // Update conversation turns estimate
+    updateConversationTurns();
   }
 
   // ---- Keyboard Shortcuts ----
@@ -1169,6 +1172,344 @@
     });
   }
 
+  // ---- API Response Parser ----
+  let _parsedUsage = null;     // Last parsed usage data
+  let _mappedTokens = null;    // Mapped token distribution
+  let _simAnimFrame = null;    // requestAnimationFrame ID for simulation
+  let _simRunning = false;     // Whether simulation is active
+
+  function initApiParser() {
+    const toggle = document.getElementById('api-parser-toggle');
+    const card = document.getElementById('api-parser-card');
+    const textarea = document.getElementById('api-response-textarea');
+    const parseBtn = document.getElementById('api-parse-btn');
+    const clearBtn = document.getElementById('api-clear-btn');
+    const applyBtn = document.getElementById('api-apply-btn');
+    const simulateBtn = document.getElementById('api-simulate-btn');
+    const stopBtn = document.getElementById('api-simulate-stop-btn');
+
+    if (!toggle || !card) return;
+
+    // Collapsible toggle
+    toggle.addEventListener('click', () => {
+      const isOpen = card.classList.toggle('api-parser-card--open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    // Parse button
+    parseBtn.addEventListener('click', () => {
+      parseApiResponse(textarea.value);
+    });
+
+    // Clear button
+    clearBtn.addEventListener('click', () => {
+      textarea.value = '';
+      _parsedUsage = null;
+      _mappedTokens = null;
+      document.getElementById('api-parser-result').style.display = 'none';
+      document.getElementById('api-parser-error').style.display = 'none';
+    });
+
+    // Apply button
+    applyBtn.addEventListener('click', () => {
+      if (_mappedTokens) {
+        applyParsedTokens(_mappedTokens);
+      }
+    });
+
+    // Simulate buttons
+    simulateBtn.addEventListener('click', startSimulation);
+    stopBtn.addEventListener('click', stopSimulation);
+  }
+
+  /**
+   * Parse a Claude API response JSON string and extract usage data.
+   */
+  function parseApiResponse(jsonStr) {
+    const resultEl = document.getElementById('api-parser-result');
+    const errorEl = document.getElementById('api-parser-error');
+
+    // Hide previous
+    resultEl.style.display = 'none';
+    errorEl.style.display = 'none';
+    _parsedUsage = null;
+    _mappedTokens = null;
+
+    if (!jsonStr || !jsonStr.trim()) {
+      showParserError('Please paste a Claude API response JSON.');
+      return;
+    }
+
+    let data;
+    try {
+      data = JSON.parse(jsonStr.trim());
+    } catch (e) {
+      showParserError('Invalid JSON: ' + e.message);
+      return;
+    }
+
+    // Find the usage field — support both top-level and nested
+    let usage = data.usage;
+    if (!usage && data.message && data.message.usage) {
+      usage = data.message.usage;
+    }
+    if (!usage || typeof usage !== 'object') {
+      showParserError('No "usage" field found in the JSON. Expected a Claude API response with usage metadata.');
+      return;
+    }
+
+    const inputTokens = typeof usage.input_tokens === 'number' ? usage.input_tokens : 0;
+    const outputTokens = typeof usage.output_tokens === 'number' ? usage.output_tokens : 0;
+    const cacheCreation = typeof usage.cache_creation_input_tokens === 'number' ? usage.cache_creation_input_tokens : 0;
+    const cacheRead = typeof usage.cache_read_input_tokens === 'number' ? usage.cache_read_input_tokens : 0;
+
+    _parsedUsage = { inputTokens, outputTokens, cacheCreation, cacheRead };
+
+    // Map tokens to categories
+    // System gets ~10% of input, Tools get ~15% of input, User gets the rest
+    const systemTokens = Math.round(inputTokens * 0.10);
+    const toolsTokens = Math.round(inputTokens * 0.15);
+    const userTokens = inputTokens - systemTokens - toolsTokens;
+    const assistantTokens = outputTokens;
+
+    _mappedTokens = {
+      system: systemTokens,
+      user: userTokens,
+      assistant: assistantTokens,
+      tools: toolsTokens,
+    };
+
+    // Display parsed values
+    document.getElementById('parsed-input-tokens').textContent = formatNumber(inputTokens);
+    document.getElementById('parsed-output-tokens').textContent = formatNumber(outputTokens);
+    document.getElementById('parsed-cache-creation').textContent = formatNumber(cacheCreation);
+    document.getElementById('parsed-cache-read').textContent = formatNumber(cacheRead);
+
+    // Display mapping preview
+    document.getElementById('mapped-system').textContent = formatNumber(systemTokens);
+    document.getElementById('mapped-user').textContent = formatNumber(userTokens);
+    document.getElementById('mapped-assistant').textContent = formatNumber(assistantTokens);
+    document.getElementById('mapped-tools').textContent = formatNumber(toolsTokens);
+
+    resultEl.style.display = '';
+  }
+
+  function showParserError(msg) {
+    const errorEl = document.getElementById('api-parser-error');
+    errorEl.textContent = msg;
+    errorEl.style.display = '';
+  }
+
+  /**
+   * Apply parsed and mapped tokens to the gauge sliders.
+   */
+  function applyParsedTokens(mapped) {
+    const model = CLAUDE_MODELS[state.modelIndex];
+
+    // Clamp total to context window
+    let total = categories.reduce((s, c) => s + mapped[c], 0);
+    if (total > model.contextWindow && total > 0) {
+      const scale = model.contextWindow / total;
+      categories.forEach(cat => {
+        mapped[cat] = Math.round(mapped[cat] * scale);
+      });
+    }
+
+    categories.forEach(cat => {
+      state.tokens[cat] = mapped[cat];
+    });
+
+    state.activePreset = null;
+    triggerGaugeBurst();
+    syncSlidersFromState();
+    pushTimelineSnapshot();
+    render();
+    save();
+    updateConversationTurns();
+  }
+
+  /**
+   * Simulate a multi-turn conversation growing over 5 seconds.
+   * Uses requestAnimationFrame for smooth animation.
+   */
+  function startSimulation() {
+    if (_simRunning) return;
+    _simRunning = true;
+
+    const simulateBtn = document.getElementById('api-simulate-btn');
+    const stopBtn = document.getElementById('api-simulate-stop-btn');
+    const statusEl = document.getElementById('api-simulate-status');
+
+    simulateBtn.style.display = 'none';
+    stopBtn.style.display = '';
+    statusEl.textContent = 'Simulating...';
+
+    const model = CLAUDE_MODELS[state.modelIndex];
+    const targetTotal = Math.round(model.contextWindow * 0.85); // Simulate to 85%
+
+    // Define per-turn token distribution (typical conversation pattern)
+    const turnPattern = {
+      system: 0.03,    // System set once
+      user: 0.35,      // User messages grow
+      assistant: 0.50, // Assistant messages dominate
+      tools: 0.12,     // Some tool usage
+    };
+
+    // Reset to zero for simulation
+    categories.forEach(cat => { state.tokens[cat] = 0; });
+
+    const DURATION = 5000; // 5 seconds
+    const startTime = performance.now();
+    let turnCount = 0;
+    let lastTurnTime = 0;
+    const TURN_INTERVAL = 300; // "turn" every 300ms for visual effect
+
+    function animateFrame(now) {
+      if (!_simRunning) return;
+
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / DURATION, 1);
+
+      // Ease-in-out cubic
+      const eased = progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      const currentTarget = Math.round(targetTotal * eased);
+
+      // Distribute tokens according to pattern
+      categories.forEach(cat => {
+        state.tokens[cat] = Math.round(currentTarget * turnPattern[cat]);
+      });
+
+      // Count simulated "turns"
+      if (elapsed - lastTurnTime > TURN_INTERVAL) {
+        turnCount++;
+        lastTurnTime = elapsed;
+        statusEl.textContent = 'Simulating... Turn ' + turnCount;
+      }
+
+      syncSlidersFromState();
+      render();
+      updateConversationTurns();
+
+      if (progress < 1) {
+        _simAnimFrame = requestAnimationFrame(animateFrame);
+      } else {
+        // Simulation complete
+        finishSimulation(turnCount);
+      }
+    }
+
+    _simAnimFrame = requestAnimationFrame(animateFrame);
+  }
+
+  function finishSimulation(turnCount) {
+    _simRunning = false;
+    _simAnimFrame = null;
+
+    const simulateBtn = document.getElementById('api-simulate-btn');
+    const stopBtn = document.getElementById('api-simulate-stop-btn');
+    const statusEl = document.getElementById('api-simulate-status');
+
+    simulateBtn.style.display = '';
+    stopBtn.style.display = 'none';
+    statusEl.textContent = 'Done! ' + turnCount + ' turns simulated.';
+
+    // Clear status after 3s
+    setTimeout(() => {
+      if (!_simRunning) {
+        statusEl.textContent = '';
+      }
+    }, 3000);
+
+    pushTimelineSnapshot();
+    save();
+  }
+
+  function stopSimulation() {
+    _simRunning = false;
+    if (_simAnimFrame) {
+      cancelAnimationFrame(_simAnimFrame);
+      _simAnimFrame = null;
+    }
+
+    const simulateBtn = document.getElementById('api-simulate-btn');
+    const stopBtn = document.getElementById('api-simulate-stop-btn');
+    const statusEl = document.getElementById('api-simulate-status');
+
+    simulateBtn.style.display = '';
+    stopBtn.style.display = 'none';
+    statusEl.textContent = 'Stopped.';
+
+    setTimeout(() => {
+      if (!_simRunning) {
+        statusEl.textContent = '';
+      }
+    }, 2000);
+
+    pushTimelineSnapshot();
+    save();
+  }
+
+  /**
+   * Update the conversation turns counter.
+   * Estimates remaining turns based on average message size per turn.
+   */
+  function updateConversationTurns() {
+    const turnsValueEl = document.getElementById('turns-remaining');
+    const turnsDetailEl = document.getElementById('turns-detail');
+    if (!turnsValueEl || !turnsDetailEl) return;
+
+    const model = CLAUDE_MODELS[state.modelIndex];
+    const total = categories.reduce((s, c) => s + state.tokens[c], 0);
+    const remaining = model.contextWindow - total;
+
+    if (total === 0 || remaining <= 0) {
+      turnsValueEl.textContent = total === 0 ? '--' : '0';
+      turnsDetailEl.textContent = total === 0 ? 'Based on avg. message size' : 'Context window is full';
+      turnsValueEl.style.color = '';
+      return;
+    }
+
+    // Calculate average per-turn cost: (user + assistant) tokens represent one turn
+    const userTokens = state.tokens.user;
+    const assistantTokens = state.tokens.assistant;
+    const turnTokens = userTokens + assistantTokens;
+
+    // Use timeline history for a better estimate if available
+    let avgTurnSize;
+    if (state.timeline.length >= 2) {
+      const recent = state.timeline.slice(-5);
+      const turnSizes = recent.map(s => (s.tokens.user || 0) + (s.tokens.assistant || 0));
+      avgTurnSize = turnSizes.reduce((s, v) => s + v, 0) / turnSizes.length;
+    } else {
+      avgTurnSize = turnTokens;
+    }
+
+    if (avgTurnSize <= 0) {
+      turnsValueEl.textContent = '--';
+      turnsDetailEl.textContent = 'Need user + assistant tokens to estimate';
+      turnsValueEl.style.color = '';
+      return;
+    }
+
+    const estimatedTurns = Math.floor(remaining / avgTurnSize);
+    turnsValueEl.textContent = estimatedTurns.toLocaleString();
+
+    const avgFormatted = formatNumber(Math.round(avgTurnSize));
+    turnsDetailEl.textContent = '~' + avgFormatted + ' tokens/turn avg.';
+
+    // Color-code the value
+    if (estimatedTurns <= 3) {
+      turnsValueEl.style.color = 'var(--accent-red)';
+    } else if (estimatedTurns <= 10) {
+      turnsValueEl.style.color = 'var(--accent-amber)';
+    } else {
+      turnsValueEl.style.color = 'var(--accent-green)';
+    }
+  }
+
   // ---- Boot ----
   function init() {
     initModelSelect();
@@ -1178,6 +1519,7 @@
     initCompareMode();
     initEstimator();
     initAnalytics();
+    initApiParser();
     initTheme();
     initColorCycling();
     initLangSelector();
