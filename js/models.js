@@ -1,7 +1,7 @@
 /**
- * Claude Context Window Visualizer — Model Definitions v2.0
+ * Claude Context Window Visualizer — Model Definitions v2.1
  * Defines Claude models, token categories, color schemes, and usage presets.
- * Updated: March 2026 — reflects current Anthropic model lineup.
+ * Updated: March 2026 — includes Opus 4.6 & Sonnet 4.6 with 1M context.
  */
 
 'use strict';
@@ -10,71 +10,87 @@
  * Model data version for localStorage migration.
  * Bump this when the model array changes order or composition.
  */
-const MODEL_DATA_VERSION = 2;
+const MODEL_DATA_VERSION = 3;
 
 /**
  * Old model IDs from v1 for migration mapping.
- * Maps old index → new model ID so share URLs and saved state survive upgrades.
  */
 const V1_MODEL_MIGRATION = [
-  'claude-4-opus',        // v1 index 0 → Claude 4 Opus
-  'claude-4-sonnet',      // v1 index 1 → Claude 4 Sonnet
-  'claude-3.5-sonnet',    // v1 index 2 → Claude 3.5 Sonnet
-  'claude-3.5-haiku',     // v1 index 3 → Claude 3.5 Haiku
-  'claude-3-opus',        // v1 index 4 → Claude 3 Opus
+  'claude-4-opus',
+  'claude-4-sonnet',
+  'claude-3.5-sonnet',
+  'claude-3.5-haiku',
+  'claude-3-opus',
+];
+
+/**
+ * v2 model IDs for v2→v3 migration.
+ */
+const V2_MODEL_IDS = [
+  'claude-4-opus', 'claude-4-sonnet', 'claude-4.5-opus', 'claude-4.5-sonnet',
+  'claude-4.5-sonnet-1m', 'claude-3.5-sonnet', 'claude-3.5-haiku', 'claude-3-opus',
 ];
 
 const CLAUDE_MODELS = [
+  // ---- Latest (4.6) ----
   {
-    id: 'claude-4-opus',
-    name: 'Claude 4 Opus',
-    contextWindow: 200000,
-    outputLimit: 32000,
-    color: '#A855F7',
+    id: 'claude-4.6-opus',
+    name: 'Claude Opus 4.6',
+    contextWindow: 1000000,
+    outputLimit: 128000,
+    color: '#E879F9',
     tier: 'flagship',
-    description: 'Top-tier intelligence, complex reasoning',
-    pricing: { inputPerMTok: 15, outputPerMTok: 75 }
+    generation: '4.6',
+    description: 'Most capable, 1M context, 128K output',
+    pricing: { inputPerMTok: 5, outputPerMTok: 25, cacheWritePerMTok: 6.25, cacheReadPerMTok: 0.50 }
   },
   {
-    id: 'claude-4-sonnet',
-    name: 'Claude 4 Sonnet',
-    contextWindow: 200000,
+    id: 'claude-4.6-sonnet',
+    name: 'Claude Sonnet 4.6',
+    contextWindow: 1000000,
     outputLimit: 64000,
-    color: '#6366F1',
+    color: '#C084FC',
     tier: 'balanced',
-    description: 'High performance, 64K output',
-    pricing: { inputPerMTok: 3, outputPerMTok: 15 }
+    generation: '4.6',
+    description: 'Fast & capable, 1M context',
+    pricing: { inputPerMTok: 3, outputPerMTok: 15, cacheWritePerMTok: 3.75, cacheReadPerMTok: 0.30 }
   },
-  {
-    id: 'claude-4.5-opus',
-    name: 'Claude 4.5 Opus',
-    contextWindow: 200000,
-    outputLimit: 32000,
-    color: '#D946EF',
-    tier: 'flagship',
-    description: 'Enhanced Opus with deeper reasoning',
-    pricing: { inputPerMTok: 15, outputPerMTok: 75 }
-  },
+  // ---- 4.5 ----
   {
     id: 'claude-4.5-sonnet',
-    name: 'Claude 4.5 Sonnet',
+    name: 'Claude Sonnet 4.5',
     contextWindow: 200000,
     outputLimit: 64000,
     color: '#818CF8',
     tier: 'balanced',
-    description: 'Latest balanced model, fast & capable',
-    pricing: { inputPerMTok: 3, outputPerMTok: 15 }
+    generation: '4.5',
+    description: 'Balanced performance, 200K context',
+    pricing: { inputPerMTok: 3, outputPerMTok: 15, cacheWritePerMTok: 3.75, cacheReadPerMTok: 0.30 }
+  },
+  // ---- 4.0 ----
+  {
+    id: 'claude-4-opus',
+    name: 'Claude Opus 4',
+    contextWindow: 200000,
+    outputLimit: 32000,
+    color: '#A855F7',
+    tier: 'flagship',
+    generation: '4',
+    description: 'Top-tier intelligence, complex reasoning',
+    pricing: { inputPerMTok: 15, outputPerMTok: 75, cacheWritePerMTok: 18.75, cacheReadPerMTok: 1.50 }
   },
   {
-    id: 'claude-4.5-sonnet-1m',
-    name: 'Claude 4.5 Sonnet (1M)',
-    contextWindow: 1000000,
+    id: 'claude-4-sonnet',
+    name: 'Claude Sonnet 4',
+    contextWindow: 200000,
     outputLimit: 64000,
-    color: '#F472B6',
-    tier: 'extended',
-    description: 'Extended thinking, 1M context window',
-    pricing: { inputPerMTok: 3, outputPerMTok: 15 }
+    color: '#6366F1',
+    tier: 'balanced',
+    generation: '4',
+    description: 'High performance, 64K output',
+    pricing: { inputPerMTok: 3, outputPerMTok: 15, cacheWritePerMTok: 3.75, cacheReadPerMTok: 0.30 }
   },
+  // ---- 3.5 ----
   {
     id: 'claude-3.5-sonnet',
     name: 'Claude 3.5 Sonnet',
@@ -82,8 +98,9 @@ const CLAUDE_MODELS = [
     outputLimit: 8192,
     color: '#3B82F6',
     tier: 'legacy',
+    generation: '3.5',
     description: 'Fast & intelligent, legacy',
-    pricing: { inputPerMTok: 3, outputPerMTok: 15 }
+    pricing: { inputPerMTok: 3, outputPerMTok: 15, cacheWritePerMTok: 3.75, cacheReadPerMTok: 0.30 }
   },
   {
     id: 'claude-3.5-haiku',
@@ -92,9 +109,11 @@ const CLAUDE_MODELS = [
     outputLimit: 8192,
     color: '#06B6D4',
     tier: 'speed',
+    generation: '3.5',
     description: 'Fastest, most cost-effective',
-    pricing: { inputPerMTok: 0.80, outputPerMTok: 4 }
+    pricing: { inputPerMTok: 0.80, outputPerMTok: 4, cacheWritePerMTok: 1.00, cacheReadPerMTok: 0.08 }
   },
+  // ---- 3 ----
   {
     id: 'claude-3-opus',
     name: 'Claude 3 Opus',
@@ -102,8 +121,9 @@ const CLAUDE_MODELS = [
     outputLimit: 4096,
     color: '#8B5CF6',
     tier: 'legacy',
+    generation: '3',
     description: 'Previous gen flagship, legacy',
-    pricing: { inputPerMTok: 15, outputPerMTok: 75 }
+    pricing: { inputPerMTok: 15, outputPerMTok: 75, cacheWritePerMTok: 18.75, cacheReadPerMTok: 1.50 }
   }
 ];
 
@@ -173,12 +193,20 @@ const PRESETS = [
 ];
 
 /**
- * Migrate a v1 model index to the corresponding v2 model index.
+ * Migrate a v1 or v2 model index to the v3 model index.
  * Returns the new index, or 0 if unmappable.
  */
-function migrateModelIndex(oldIndex) {
-  if (oldIndex < 0 || oldIndex >= V1_MODEL_MIGRATION.length) return 0;
-  var targetId = V1_MODEL_MIGRATION[oldIndex];
+function migrateModelIndex(oldIndex, fromVersion) {
+  var targetId;
+  if (fromVersion === 1 || !fromVersion) {
+    if (oldIndex < 0 || oldIndex >= V1_MODEL_MIGRATION.length) return 0;
+    targetId = V1_MODEL_MIGRATION[oldIndex];
+  } else if (fromVersion === 2) {
+    if (oldIndex < 0 || oldIndex >= V2_MODEL_IDS.length) return 0;
+    targetId = V2_MODEL_IDS[oldIndex];
+  } else {
+    return oldIndex < CLAUDE_MODELS.length ? oldIndex : 0;
+  }
   var newIndex = CLAUDE_MODELS.findIndex(function (m) { return m.id === targetId; });
   return newIndex >= 0 ? newIndex : 0;
 }

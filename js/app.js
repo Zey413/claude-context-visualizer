@@ -1251,12 +1251,13 @@
       if (!raw) return false;
       const data = JSON.parse(raw);
 
-      // Migration: if saved data is from v1 (no modelDataVersion), remap model indices
+      // Migration: if saved data is from older version, remap model indices
       var needsMigration = !data.modelDataVersion || data.modelDataVersion < MODEL_DATA_VERSION;
+      var fromVersion = data.modelDataVersion || 1;
 
       if (typeof data.modelIndex === 'number') {
         if (needsMigration && typeof migrateModelIndex === 'function') {
-          state.modelIndex = migrateModelIndex(data.modelIndex);
+          state.modelIndex = migrateModelIndex(data.modelIndex, fromVersion);
         } else if (data.modelIndex < CLAUDE_MODELS.length) {
           state.modelIndex = data.modelIndex;
         }
@@ -1276,7 +1277,7 @@
       }
       if (typeof data.compareModelIndex === 'number') {
         if (needsMigration && typeof migrateModelIndex === 'function') {
-          state.compareModelIndex = migrateModelIndex(data.compareModelIndex);
+          state.compareModelIndex = migrateModelIndex(data.compareModelIndex, fromVersion);
         } else if (data.compareModelIndex < CLAUDE_MODELS.length) {
           state.compareModelIndex = data.compareModelIndex;
         }
@@ -2296,8 +2297,8 @@
     // Budget -> model index preference: [cheapest, balanced, max]
     budget: {
       'cheapest':  [6, 6, 6],  // Haiku always for cheapest (index 6 = Claude 3.5 Haiku)
-      'balanced':  [6, 5, 1],  // Haiku, 3.5 Sonnet, 4 Sonnet
-      'max':       [1, 0, 0],  // 4 Sonnet, 4 Opus, 4 Opus
+      'balanced':  [6, 2, 1],  // Haiku, Sonnet 4.5, Sonnet 4.6
+      'max':       [1, 0, 0],  // Sonnet 4.6, Opus 4.6, Opus 4.6
     },
   };
 
@@ -2343,9 +2344,11 @@
     var budgetModels = PLANNER_PROFILES.budget[budget] || [3, 2, 1];
     var modelIdx = budgetModels[tier];
 
-    // If we need very large context and selected model doesn't have 1M, consider 1M Sonnet
+    // If we need very large context, consider 1M models
     if (needsLargeContext && budget === 'max') {
-      modelIdx = 4; // Claude 4.5 Sonnet (1M)
+      modelIdx = 0; // Claude Opus 4.6 (1M)
+    } else if (needsLargeContext) {
+      modelIdx = 1; // Claude Sonnet 4.6 (1M, cheaper)
     }
 
     var model = CLAUDE_MODELS[modelIdx];
