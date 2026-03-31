@@ -1205,7 +1205,7 @@
 
     // Update cache visualizer if open
     if (typeof CacheViz !== 'undefined' && CacheViz.isInited()) {
-      CacheViz.update(state.tokens, CLAUDE_MODELS[state.modelIndex]);
+      CacheViz.update(state.tokens, state.modelIndex);
     }
 
     // Update cost forecast if open

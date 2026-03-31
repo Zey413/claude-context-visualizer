@@ -716,9 +716,12 @@ var SankeyDiagram = (function () {
     return s.length < 2 ? '0' + s : s;
   }
 
+  function isInited() { return _inited; }
+
   // ---- Public API ----
   return {
-    init:   init,
-    update: update
+    init:     init,
+    update:   update,
+    isInited: isInited
   };
 })();
