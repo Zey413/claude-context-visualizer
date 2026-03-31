@@ -160,6 +160,7 @@ body {
 .glass-card:hover {
   border-color: var(--border-hover);
   background: var(--bg-card-hover);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* --- App Layout --- */
@@ -233,6 +234,7 @@ body {
   padding: 0;
   background: var(--bg-card);
   backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
@@ -274,6 +276,7 @@ body {
   padding: 9px 16px;
   background: var(--bg-card);
   backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
@@ -310,6 +313,7 @@ body {
   appearance: none;
   background: var(--bg-card);
   backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-primary);
@@ -366,6 +370,39 @@ body {
   align-items: center;
   gap: 20px;
   position: relative;
+  overflow: hidden;
+}
+
+/* Animated gradient border — holographic card effect */
+.gauge-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--gauge-border-angle, 0deg),
+    #8B5CF6,
+    #3B82F6,
+    #8B5CF6
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0.15;
+  pointer-events: none;
+  animation: gaugeCardBorderSpin 6s linear infinite;
+}
+
+@keyframes gaugeCardBorderSpin {
+  to { --gauge-border-angle: 360deg; }
+}
+
+@property --gauge-border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
 .gauge-card__model-label {
@@ -615,6 +652,12 @@ body {
   padding: 16px;
   cursor: default;
   animation: fadeSlideIn 0.5s ease both;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color var(--transition-fast), background 300ms ease;
+}
+
+.token-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .token-card:nth-child(1) { animation-delay: 0.15s; }
@@ -1103,6 +1146,11 @@ body {
   font-size: 1rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  transition: transform 150ms ease;
+}
+
+.stat-item__value.stat-bump {
+  transform: scale(1.05);
 }
 
 .stat-item__value--remaining {
@@ -1325,6 +1373,12 @@ body {
   color: var(--accent-purple);
   text-decoration: none;
   transition: color var(--transition-fast);
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
 
 .footer a:hover {
@@ -1447,6 +1501,7 @@ body {
   transform: translateX(-50%);
   background: var(--tooltip-bg);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-hover);
   border-radius: var(--radius-sm);
   padding: 6px 10px;
@@ -2170,6 +2225,7 @@ body {
   position: absolute;
   background: var(--tooltip-bg);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-hover);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
@@ -2409,6 +2465,7 @@ body {
   height: 36px;
   background: var(--bg-card);
   backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-secondary);

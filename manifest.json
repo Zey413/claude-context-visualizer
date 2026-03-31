@@ -1,11 +1,15 @@
 {
-  "name": "Claude Context Visualizer",
+  "name": "Claude Context Window Visualizer",
   "short_name": "CtxViz",
-  "description": "Interactive visualization of Claude's context window token usage",
+  "description": "Interactive visualization of Claude's context window token usage with analytics, cost estimates, and model comparison",
   "start_url": ".",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#0A0A0F",
   "theme_color": "#8B5CF6",
+  "categories": ["developer tools", "utilities"],
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
     {
       "src": "assets/favicon.svg",
@@ -13,5 +17,8 @@
       "type": "image/svg+xml",
       "purpose": "any"
     }
-  ]
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
