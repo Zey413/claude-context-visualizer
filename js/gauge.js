@@ -212,7 +212,7 @@ class GaugeRenderer {
       this._animateStart = performance.now();
       this._animateFrom = { ...this.currentSegments };
       this._animateFromPercent = this.currentPercent;
-      requestAnimationFrame((t) => this._animate(t));
+      this._rafId = requestAnimationFrame((t) => this._animate(t));
     } else {
       // Restart animation from current interpolated state
       this._animateStart = performance.now();
@@ -246,9 +246,10 @@ class GaugeRenderer {
     this._drawSegments();
 
     if (t < 1) {
-      requestAnimationFrame((t2) => this._animate(t2));
+      this._rafId = requestAnimationFrame((t2) => this._animate(t2));
     } else {
       this.animating = false;
+      this._rafId = null;
     }
   }
 

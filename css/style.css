@@ -1168,6 +1168,8 @@ body {
   padding: 0;
   animation: fadeSlideIn 0.5s ease 0.5s both;
   overflow: hidden;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 50px;
 }
 
 .analytics-body {
@@ -1655,6 +1657,8 @@ body {
   padding: 0;
   animation: fadeSlideIn 0.5s ease 0.55s both;
   overflow: hidden;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 50px;
 }
 
 .api-parser-card--open .estimator-toggle__chevron {
