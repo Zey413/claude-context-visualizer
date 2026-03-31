@@ -51,6 +51,75 @@
   let _analyticsInited = false;
   let _apiParserInited = false;
   let _replayInited = false;
+  let _templatesInited = false;
+  let _plannerInited = false;
+
+  // ---- Prompt Templates ----
+  const PROMPT_TEMPLATES = [
+    {
+      id: 'coding-assistant',
+      name: 'Coding Assistant',
+      icon: '\uD83D\uDCBB',
+      description: 'Full-stack dev with code review capabilities',
+      systemTokens: 1200,
+      avgUserTokens: 800,
+      avgAssistantTokens: 2000,
+      avgToolTokens: 500
+    },
+    {
+      id: 'customer-support',
+      name: 'Customer Support',
+      icon: '\uD83C\uDFA7',
+      description: 'Help desk agent with knowledge base',
+      systemTokens: 2500,
+      avgUserTokens: 300,
+      avgAssistantTokens: 600,
+      avgToolTokens: 200
+    },
+    {
+      id: 'data-analyst',
+      name: 'Data Analyst',
+      icon: '\uD83D\uDCCA',
+      description: 'SQL generation and data interpretation',
+      systemTokens: 1800,
+      avgUserTokens: 500,
+      avgAssistantTokens: 1500,
+      avgToolTokens: 3000
+    },
+    {
+      id: 'creative-writer',
+      name: 'Creative Writer',
+      icon: '\u270D\uFE0F',
+      description: 'Long-form content generation',
+      systemTokens: 800,
+      avgUserTokens: 400,
+      avgAssistantTokens: 4000,
+      avgToolTokens: 0
+    },
+    {
+      id: 'rag-agent',
+      name: 'RAG Agent',
+      icon: '\uD83D\uDD0D',
+      description: 'Retrieval-augmented generation with large context',
+      systemTokens: 3000,
+      avgUserTokens: 15000,
+      avgAssistantTokens: 2000,
+      avgToolTokens: 8000
+    },
+    {
+      id: 'claude-code',
+      name: 'Claude Code',
+      icon: '\uD83E\uDD16',
+      description: 'Autonomous coding agent with many tool calls',
+      systemTokens: 5000,
+      avgUserTokens: 3000,
+      avgAssistantTokens: 8000,
+      avgToolTokens: 25000
+    }
+  ];
+
+  // Track which template is currently applied
+  let _activeTemplateId = null;
 
   // ---- Conversation Replay Scenarios ----
   const REPLAY_SCENARIOS = [
@@ -658,6 +727,7 @@
       state.tokens[cat] = Math.round(model.contextWindow * preset.allocation[cat]);
     });
     state.activePreset = index;
+    clearActiveTemplate();
 
     // Trigger burst animation on preset switch
     triggerGaugeBurst();
@@ -666,6 +736,23 @@
     pushTimelineSnapshot();
     render();
     save();
+  }
+
+  /**
+   * Clear the active template visual state when another action changes the sliders.
+   */
+  function clearActiveTemplate() {
+    if (_activeTemplateId === null) return;
+    _activeTemplateId = null;
+    var allCards = document.querySelectorAll('.template-card');
+    allCards.forEach(function (card) {
+      card.classList.remove('template-card--active');
+    });
+    var allBtns = document.querySelectorAll('.template-card__apply-btn');
+    allBtns.forEach(function (btn) {
+      btn.classList.remove('template-card__apply-btn--applied');
+      btn.textContent = 'Apply';
+    });
   }
 
   // ---- Slider & Input Logic ----
@@ -709,6 +796,7 @@
         enforceMax(cat);
         inputs[cat].value = state.tokens[cat];
         state.activePreset = null;
+        clearActiveTemplate();
         pushTimelineSnapshot();
         scheduleRender();
         save();
@@ -721,6 +809,7 @@
         enforceMax(cat);
         sliders[cat].value = state.tokens[cat];
         state.activePreset = null;
+        clearActiveTemplate();
         pushTimelineSnapshot();
         scheduleRender();
         save();
@@ -1126,6 +1215,7 @@
   function save() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        modelDataVersion: MODEL_DATA_VERSION,
         modelIndex: state.modelIndex,
         tokens: state.tokens,
         activePreset: state.activePreset,
@@ -1141,8 +1231,16 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return false;
       const data = JSON.parse(raw);
-      if (typeof data.modelIndex === 'number' && data.modelIndex < CLAUDE_MODELS.length) {
-        state.modelIndex = data.modelIndex;
+
+      // Migration: if saved data is from v1 (no modelDataVersion), remap model indices
+      var needsMigration = !data.modelDataVersion || data.modelDataVersion < MODEL_DATA_VERSION;
+
+      if (typeof data.modelIndex === 'number') {
+        if (needsMigration && typeof migrateModelIndex === 'function') {
+          state.modelIndex = migrateModelIndex(data.modelIndex);
+        } else if (data.modelIndex < CLAUDE_MODELS.length) {
+          state.modelIndex = data.modelIndex;
+        }
       }
       if (data.tokens) {
         categories.forEach(cat => {
@@ -1157,12 +1255,22 @@
       if (typeof data.compareMode === 'boolean') {
         state.compareMode = data.compareMode;
       }
-      if (typeof data.compareModelIndex === 'number' && data.compareModelIndex < CLAUDE_MODELS.length) {
-        state.compareModelIndex = data.compareModelIndex;
+      if (typeof data.compareModelIndex === 'number') {
+        if (needsMigration && typeof migrateModelIndex === 'function') {
+          state.compareModelIndex = migrateModelIndex(data.compareModelIndex);
+        } else if (data.compareModelIndex < CLAUDE_MODELS.length) {
+          state.compareModelIndex = data.compareModelIndex;
+        }
       }
       if (Array.isArray(data.timeline)) {
         state.timeline = data.timeline.slice(-MAX_TIMELINE);
       }
+
+      // If migrated, re-save immediately with new version
+      if (needsMigration) {
+        save();
+      }
+
       return true;
     } catch (e) {
       return false;
@@ -1972,6 +2080,388 @@
     }
   }
 
+  // ---- Prompt Templates ----
+  function initTemplates() {
+    const toggle = document.getElementById('templates-toggle');
+    const card = document.getElementById('templates-card');
+
+    if (!toggle || !card) return;
+
+    toggle.addEventListener('click', () => {
+      const isOpen = card.classList.toggle('templates-card--open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+      if (isOpen && !_templatesInited) {
+        _templatesInited = true;
+        _initTemplatesBody();
+      }
+    });
+  }
+
+  function _initTemplatesBody() {
+    const grid = document.getElementById('templates-grid');
+    if (!grid) return;
+
+    PROMPT_TEMPLATES.forEach(function (tpl) {
+      var totalTokens = tpl.systemTokens + tpl.avgUserTokens + tpl.avgAssistantTokens + tpl.avgToolTokens;
+
+      var card = document.createElement('div');
+      card.className = 'template-card';
+      card.dataset.templateId = tpl.id;
+
+      // Compute segment percentages for the mini bar
+      var sysPct = (tpl.systemTokens / totalTokens) * 100;
+      var userPct = (tpl.avgUserTokens / totalTokens) * 100;
+      var asstPct = (tpl.avgAssistantTokens / totalTokens) * 100;
+      var toolPct = (tpl.avgToolTokens / totalTokens) * 100;
+
+      // Header: icon + name + description
+      var headerHTML =
+        '<div class="template-card__header">' +
+          '<span class="template-card__icon" aria-hidden="true">' + tpl.icon + '</span>' +
+          '<div class="template-card__info">' +
+            '<div class="template-card__name">' + tpl.name + '</div>' +
+            '<div class="template-card__desc">' + tpl.description + '</div>' +
+            '<div class="template-card__tokens">' + formatNumber(totalTokens) + ' tokens total</div>' +
+          '</div>' +
+        '</div>';
+
+      // Mini proportional bar
+      var barHTML =
+        '<div class="template-card__bar">' +
+          '<div class="template-card__bar-seg template-card__bar-seg--system" style="width:' + sysPct.toFixed(1) + '%"></div>' +
+          '<div class="template-card__bar-seg template-card__bar-seg--user" style="width:' + userPct.toFixed(1) + '%"></div>' +
+          '<div class="template-card__bar-seg template-card__bar-seg--assistant" style="width:' + asstPct.toFixed(1) + '%"></div>' +
+          '<div class="template-card__bar-seg template-card__bar-seg--tools" style="width:' + toolPct.toFixed(1) + '%"></div>' +
+          '<div class="template-card__bar-seg template-card__bar-seg--remaining"></div>' +
+        '</div>';
+
+      // Apply button
+      var btnHTML =
+        '<button class="template-card__apply-btn" data-template-id="' + tpl.id + '" ' +
+          'title="Apply ' + tpl.name + ' template to sliders" ' +
+          'aria-label="Apply ' + tpl.name + ' template: ' + tpl.description + '">' +
+          'Apply' +
+        '</button>';
+
+      card.innerHTML = headerHTML + barHTML + btnHTML;
+      grid.appendChild(card);
+    });
+
+    // Delegate click events on apply buttons
+    grid.addEventListener('click', function (e) {
+      var btn = e.target.closest('.template-card__apply-btn');
+      if (!btn) return;
+      var templateId = btn.dataset.templateId;
+      applyTemplate(templateId);
+    });
+  }
+
+  /**
+   * Apply a prompt template by smoothly animating sliders to the target values.
+   */
+  function applyTemplate(templateId) {
+    var tpl = PROMPT_TEMPLATES.find(function (t) { return t.id === templateId; });
+    if (!tpl) return;
+
+    var targetTokens = {
+      system: tpl.systemTokens,
+      user: tpl.avgUserTokens,
+      assistant: tpl.avgAssistantTokens,
+      tools: tpl.avgToolTokens
+    };
+
+    // Clamp total to context window
+    var model = CLAUDE_MODELS[state.modelIndex];
+    var total = categories.reduce(function (s, c) { return s + targetTokens[c]; }, 0);
+    if (total > model.contextWindow && total > 0) {
+      var scale = model.contextWindow / total;
+      categories.forEach(function (cat) {
+        targetTokens[cat] = Math.round(targetTokens[cat] * scale);
+      });
+    }
+
+    // Update active template tracking
+    _activeTemplateId = templateId;
+    state.activePreset = null;
+
+    // Update active visual state on cards
+    var allCards = document.querySelectorAll('.template-card');
+    allCards.forEach(function (card) {
+      card.classList.toggle('template-card--active', card.dataset.templateId === templateId);
+    });
+    var allBtns = document.querySelectorAll('.template-card__apply-btn');
+    allBtns.forEach(function (btn) {
+      var isActive = btn.dataset.templateId === templateId;
+      btn.classList.toggle('template-card__apply-btn--applied', isActive);
+      btn.textContent = isActive ? 'Applied \u2713' : 'Apply';
+    });
+
+    // Smoothly animate sliders to target values
+    animateSlidersTo(targetTokens);
+  }
+
+  /**
+   * Animate all sliders smoothly from current to target values over 400ms.
+   */
+  function animateSlidersTo(targetTokens) {
+    var startTokens = {};
+    categories.forEach(function (cat) {
+      startTokens[cat] = state.tokens[cat];
+    });
+
+    var duration = 400;
+    var startTime = performance.now();
+
+    function step(now) {
+      var elapsed = now - startTime;
+      var progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic
+      var eased = 1 - Math.pow(1 - progress, 3);
+
+      categories.forEach(function (cat) {
+        var val = Math.round(startTokens[cat] + (targetTokens[cat] - startTokens[cat]) * eased);
+        state.tokens[cat] = val;
+        if (sliders[cat]) sliders[cat].value = val;
+        if (inputs[cat]) inputs[cat].value = val;
+      });
+
+      render();
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        // Ensure final values are exact
+        categories.forEach(function (cat) {
+          state.tokens[cat] = targetTokens[cat];
+        });
+        syncSlidersFromState();
+        triggerGaugeBurst();
+        pushTimelineSnapshot();
+        render();
+        save();
+      }
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  // ---- Context Budget Planner ----
+  /**
+   * Planner recommendation profiles.
+   * Each combination of answers maps to a model index, token allocation proportions,
+   * and a utilization target.
+   */
+  const PLANNER_PROFILES = {
+    // Use-case base allocations (proportions of context window)
+    usecase: {
+      'simple-chat':  { system: 0.02, user: 0.08, assistant: 0.12, tools: 0.00 },
+      'code-assist':  { system: 0.05, user: 0.15, assistant: 0.25, tools: 0.10 },
+      'doc-analysis': { system: 0.03, user: 0.45, assistant: 0.15, tools: 0.02 },
+      'agentic':      { system: 0.06, user: 0.10, assistant: 0.20, tools: 0.30 },
+    },
+    // Conversation length multipliers (scale user + assistant proportionally)
+    length: {
+      'short':     1.0,
+      'medium':    1.8,
+      'long':      2.8,
+      'very-long': 4.0,
+    },
+    // Tool adjustments (added to tools allocation)
+    tools: {
+      'none':    0.00,
+      'light':   0.03,
+      'heavy':   0.10,
+      'agentic': 0.20,
+    },
+    // Budget -> model index preference: [cheapest, balanced, max]
+    budget: {
+      'cheapest':  [6, 6, 6],  // Haiku always for cheapest (index 6 = Claude 3.5 Haiku)
+      'balanced':  [6, 5, 1],  // Haiku, 3.5 Sonnet, 4 Sonnet
+      'max':       [1, 0, 0],  // 4 Sonnet, 4 Opus, 4 Opus
+    },
+  };
+
+  /**
+   * Compute a recommendation from planner answers.
+   * Returns { modelIndex, tokens: { system, user, assistant, tools }, utilization, cost }
+   */
+  function computePlannerRecommendation(usecase, length, tools, budget) {
+    // Start with use-case base allocation
+    var base = PLANNER_PROFILES.usecase[usecase];
+    if (!base) return null;
+
+    var alloc = {
+      system: base.system,
+      user: base.user,
+      assistant: base.assistant,
+      tools: base.tools,
+    };
+
+    // Scale user + assistant by conversation length
+    var lenMult = PLANNER_PROFILES.length[length] || 1.0;
+    alloc.user *= lenMult;
+    alloc.assistant *= lenMult;
+
+    // Add tools overhead
+    var toolsAdd = PLANNER_PROFILES.tools[tools] || 0;
+    alloc.tools += toolsAdd;
+
+    // Compute total utilization
+    var totalProportion = alloc.system + alloc.user + alloc.assistant + alloc.tools;
+
+    // Determine complexity tier for model selection (0=low, 1=mid, 2=high)
+    var complexityScore = 0;
+    if (usecase === 'code-assist' || usecase === 'agentic') complexityScore++;
+    if (length === 'long' || length === 'very-long') complexityScore++;
+    if (tools === 'heavy' || tools === 'agentic') complexityScore++;
+    var tier = Math.min(complexityScore, 2);
+
+    // Need large context window?
+    var needsLargeContext = totalProportion > 0.80 || length === 'very-long';
+
+    // Select model from budget preferences
+    var budgetModels = PLANNER_PROFILES.budget[budget] || [3, 2, 1];
+    var modelIdx = budgetModels[tier];
+
+    // If we need very large context and selected model doesn't have 1M, consider 1M Sonnet
+    if (needsLargeContext && budget === 'max') {
+      modelIdx = 4; // Claude 4.5 Sonnet (1M)
+    }
+
+    var model = CLAUDE_MODELS[modelIdx];
+
+    // Cap total utilization at a sensible max (leave headroom)
+    var maxUtil = 0.85;
+    if (totalProportion > maxUtil) {
+      var scale = maxUtil / totalProportion;
+      alloc.system *= scale;
+      alloc.user *= scale;
+      alloc.assistant *= scale;
+      alloc.tools *= scale;
+      totalProportion = maxUtil;
+    }
+
+    // Convert proportions to token counts
+    var tokens = {
+      system: Math.round(alloc.system * model.contextWindow),
+      user: Math.round(alloc.user * model.contextWindow),
+      assistant: Math.round(alloc.assistant * model.contextWindow),
+      tools: Math.round(alloc.tools * model.contextWindow),
+    };
+
+    var totalTokens = tokens.system + tokens.user + tokens.assistant + tokens.tools;
+    var utilization = model.contextWindow > 0 ? (totalTokens / model.contextWindow) * 100 : 0;
+
+    // Estimate cost
+    var inputTokens = tokens.system + tokens.user + tokens.tools;
+    var outputTokens = tokens.assistant;
+    var cost = (inputTokens / 1000000) * model.pricing.inputPerMTok +
+               (outputTokens / 1000000) * model.pricing.outputPerMTok;
+
+    return {
+      modelIndex: modelIdx,
+      modelName: model.name,
+      tokens: tokens,
+      utilization: Math.round(utilization),
+      cost: cost,
+    };
+  }
+
+  function initPlanner() {
+    var toggle = document.getElementById('planner-toggle');
+    var card = document.getElementById('planner-card');
+
+    if (!toggle || !card) return;
+
+    toggle.addEventListener('click', function () {
+      var isOpen = card.classList.toggle('planner-card--open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+      if (isOpen && !_plannerInited) {
+        _plannerInited = true;
+        _initPlannerBody();
+      }
+    });
+  }
+
+  function _initPlannerBody() {
+    var radios = document.querySelectorAll('.planner-radio');
+    var resultEl = document.getElementById('planner-result');
+    var applyBtn = document.getElementById('planner-apply-btn');
+
+    // Track current recommendation
+    var _currentRec = null;
+
+    // Listen for any radio change
+    radios.forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        _currentRec = updatePlannerRecommendation();
+      });
+    });
+
+    // Apply button
+    applyBtn.addEventListener('click', function () {
+      if (!_currentRec) return;
+
+      // Update model selector
+      state.modelIndex = _currentRec.modelIndex;
+      modelSelect.value = _currentRec.modelIndex;
+
+      // Update token allocations
+      categories.forEach(function (cat) {
+        state.tokens[cat] = _currentRec.tokens[cat];
+      });
+
+      state.activePreset = null;
+      updateSliderMax();
+      triggerGaugeBurst();
+      syncSlidersFromState();
+      pushTimelineSnapshot();
+      render();
+      save();
+    });
+
+    function updatePlannerRecommendation() {
+      var usecase = getRadioValue('planner-usecase');
+      var length = getRadioValue('planner-length');
+      var tools = getRadioValue('planner-tools');
+      var budget = getRadioValue('planner-budget');
+
+      // Need all 4 answers
+      if (!usecase || !length || !tools || !budget) {
+        resultEl.style.display = 'none';
+        return null;
+      }
+
+      var rec = computePlannerRecommendation(usecase, length, tools, budget);
+      if (!rec) {
+        resultEl.style.display = 'none';
+        return null;
+      }
+
+      // Populate result
+      document.getElementById('planner-rec-model').textContent = rec.modelName;
+      document.getElementById('planner-rec-system').textContent = formatNumber(rec.tokens.system);
+      document.getElementById('planner-rec-user').textContent = formatNumber(rec.tokens.user);
+      document.getElementById('planner-rec-assistant').textContent = formatNumber(rec.tokens.assistant);
+      document.getElementById('planner-rec-tools').textContent = formatNumber(rec.tokens.tools);
+
+      var summaryEl = document.getElementById('planner-rec-summary');
+      var costStr = rec.cost < 0.01 ? '<$0.01' : '$' + rec.cost.toFixed(2);
+      summaryEl.innerHTML = 'We recommend <strong>' + rec.modelName + '</strong> with ~' +
+        rec.utilization + '% context utilization. Estimated cost: <strong>' + costStr + '/request</strong>.';
+
+      resultEl.style.display = '';
+      return rec;
+    }
+
+    function getRadioValue(name) {
+      var checked = document.querySelector('input[name="' + name + '"]:checked');
+      return checked ? checked.value : null;
+    }
+  }
+
   // ---- Conversation Replay ----
   function initReplay() {
     const toggle = document.getElementById('replay-toggle');
@@ -2244,6 +2734,8 @@
     initAnalytics();
     initPricing();
     initApiParser();
+    initTemplates();
+    initPlanner();
     initReplay();
     initHeatmap();
     initTheme();
