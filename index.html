@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Context Window Visualizer</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Background effects -->
+  <div class="bg-noise"></div>
+  <div class="bg-glow bg-glow--1"></div>
+  <div class="bg-glow bg-glow--2"></div>
+
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header__brand">
+        <div class="header__logo">
+          <svg viewBox="0 0 32 32" width="32" height="32">
+            <defs>
+              <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#8B5CF6"/>
+                <stop offset="100%" style="stop-color:#3B82F6"/>
+              </linearGradient>
+            </defs>
+            <circle cx="16" cy="16" r="14" fill="none" stroke="#1E1B2E" stroke-width="3"/>
+            <circle cx="16" cy="16" r="14" fill="none" stroke="url(#logo-grad)" stroke-width="3"
+              stroke-dasharray="66 22" stroke-linecap="round" transform="rotate(-90 16 16)"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="header__title">Context Window Visualizer</h1>
+          <p class="header__subtitle">Claude Token Usage Monitor</p>
+        </div>
+      </div>
+      <div class="header__controls">
+        <div class="select-wrapper">
+          <select id="model-select" class="model-select">
+            <!-- Populated by JS -->
+          </select>
+          <span class="select-arrow">▾</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="main">
+      <!-- Left: Gauge -->
+      <section class="gauge-section">
+        <div class="gauge-card glass-card">
+          <div id="gauge-container" class="gauge-container">
+            <!-- SVG gauge rendered by JS -->
+          </div>
+          <div class="gauge-status" id="gauge-status">
+            <span class="gauge-status__dot"></span>
+            <span class="gauge-status__text">Normal</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Controls -->
+      <section class="controls-section">
+        <!-- Token Breakdown Cards -->
+        <div class="breakdown-grid">
+          <div class="token-card glass-card" data-category="system">
+            <div class="token-card__header">
+              <span class="token-card__icon">⚙️</span>
+              <span class="token-card__label">System Prompt</span>
+            </div>
+            <div class="token-card__value" id="system-value">0</div>
+            <div class="token-card__bar">
+              <div class="token-card__bar-fill" id="system-bar" style="--cat-color: #8B5CF6"></div>
+            </div>
+            <div class="token-card__percent" id="system-percent">0%</div>
+          </div>
+
+          <div class="token-card glass-card" data-category="user">
+            <div class="token-card__header">
+              <span class="token-card__icon">👤</span>
+              <span class="token-card__label">User Messages</span>
+            </div>
+            <div class="token-card__value" id="user-value">0</div>
+            <div class="token-card__bar">
+              <div class="token-card__bar-fill" id="user-bar" style="--cat-color: #3B82F6"></div>
+            </div>
+            <div class="token-card__percent" id="user-percent">0%</div>
+          </div>
+
+          <div class="token-card glass-card" data-category="assistant">
+            <div class="token-card__header">
+              <span class="token-card__icon">🤖</span>
+              <span class="token-card__label">Assistant Output</span>
+            </div>
+            <div class="token-card__value" id="assistant-value">0</div>
+            <div class="token-card__bar">
+              <div class="token-card__bar-fill" id="assistant-bar" style="--cat-color: #10B981"></div>
+            </div>
+            <div class="token-card__percent" id="assistant-percent">0%</div>
+          </div>
+
+          <div class="token-card glass-card" data-category="tools">
+            <div class="token-card__header">
+              <span class="token-card__icon">🔧</span>
+              <span class="token-card__label">Tool Use</span>
+            </div>
+            <div class="token-card__value" id="tools-value">0</div>
+            <div class="token-card__bar">
+              <div class="token-card__bar-fill" id="tools-bar" style="--cat-color: #F59E0B"></div>
+            </div>
+            <div class="token-card__percent" id="tools-percent">0%</div>
+          </div>
+        </div>
+
+        <!-- Sliders -->
+        <div class="sliders-card glass-card">
+          <h3 class="sliders-card__title">Adjust Token Allocation</h3>
+
+          <div class="slider-row" data-category="system">
+            <label class="slider-label">
+              <span class="slider-label__dot" style="background: #8B5CF6"></span>
+              System
+            </label>
+            <input type="range" id="slider-system" class="token-slider" min="0" max="100" value="0"
+              style="--slider-color: #8B5CF6">
+            <input type="number" id="input-system" class="token-input" value="0" min="0">
+          </div>
+
+          <div class="slider-row" data-category="user">
+            <label class="slider-label">
+              <span class="slider-label__dot" style="background: #3B82F6"></span>
+              User
+            </label>
+            <input type="range" id="slider-user" class="token-slider" min="0" max="100" value="0"
+              style="--slider-color: #3B82F6">
+            <input type="number" id="input-user" class="token-input" value="0" min="0">
+          </div>
+
+          <div class="slider-row" data-category="assistant">
+            <label class="slider-label">
+              <span class="slider-label__dot" style="background: #10B981"></span>
+              Assistant
+            </label>
+            <input type="range" id="slider-assistant" class="token-slider" min="0" max="100" value="0"
+              style="--slider-color: #10B981">
+            <input type="number" id="input-assistant" class="token-input" value="0" min="0">
+          </div>
+
+          <div class="slider-row" data-category="tools">
+            <label class="slider-label">
+              <span class="slider-label__dot" style="background: #F59E0B"></span>
+              Tools
+            </label>
+            <input type="range" id="slider-tools" class="token-slider" min="0" max="100" value="0"
+              style="--slider-color: #F59E0B">
+            <input type="number" id="input-tools" class="token-input" value="0" min="0">
+          </div>
+        </div>
+
+        <!-- Presets -->
+        <div class="presets-card glass-card">
+          <h3 class="presets-card__title">Quick Presets</h3>
+          <div class="presets-grid" id="presets-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Stats Summary Bar -->
+    <section class="stats-bar glass-card">
+      <div class="stat-item">
+        <span class="stat-item__label">Total Used</span>
+        <span class="stat-item__value" id="stat-total-used">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-item__label">Remaining</span>
+        <span class="stat-item__value stat-item__value--remaining" id="stat-remaining">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-item__label">Context Window</span>
+        <span class="stat-item__value" id="stat-context-window">200K</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-item__label">Output Limit</span>
+        <span class="stat-item__value" id="stat-output-limit">16K</span>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Built with ✨ by <a href="https://github.com/Zey413" target="_blank" rel="noopener">@Zey413</a></p>
+      <p class="footer__hint">Keyboard: <kbd>R</kbd> Reset &middot; <kbd>1</kbd>-<kbd>4</kbd> Presets</p>
+    </footer>
+  </div>
+
+  <!-- Scripts in dependency order -->
+  <script src="js/models.js"></script>
+  <script src="js/gauge.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
