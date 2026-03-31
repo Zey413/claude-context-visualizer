@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ctx-viz-v9';
+const CACHE_NAME = 'ctx-viz-v10';
 const ASSETS = [
   './',
   './index.html',
@@ -16,6 +16,7 @@ const ASSETS = [
   './js/sankey.js',
   './js/cache-viz.js',
   './js/cost-forecast.js',
+  './js/scroll-fx.js',
   './js/app.js',
   './assets/favicon.svg',
   './manifest.json',

@@ -4860,3 +4860,83 @@ body {
   border-left: 3px solid var(--accent-green);
   border-radius: 0 0.3rem 0.3rem 0;
 }
+
+/* =========================================
+   Scroll Reveal Animations
+   ========================================= */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* =========================================
+   Micro-Interaction Polish
+   ========================================= */
+.btn-pressed {
+  transform: scale(0.96) !important;
+  transition: transform 0.1s ease !important;
+}
+
+.card-hover-fx {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-hover-fx:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.12), 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.preset-btn { transition: background 0.2s, transform 0.2s, box-shadow 0.2s; }
+.preset-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2); }
+.preset-btn:active { transform: scale(0.97); }
+
+input[type="range"]:focus-visible { outline: 2px solid var(--accent-purple); outline-offset: 3px; border-radius: 4px; }
+button:focus-visible, select:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent-purple); outline-offset: 2px; border-radius: 0.3rem;
+}
+
+.estimator-toggle { transition: background 0.2s, transform 0.15s; }
+.estimator-toggle:hover { background: var(--glass-hover); }
+.estimator-toggle:active { transform: scale(0.99); }
+
+.estimator-toggle__chevron { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+.estimator-card--open .estimator-toggle__chevron,
+.charts-card--open .estimator-toggle__chevron,
+.stream-card--open .estimator-toggle__chevron,
+.memory-card--open .estimator-toggle__chevron,
+.sankey-card--open .estimator-toggle__chevron,
+.cache-card--open .estimator-toggle__chevron,
+.forecast-card--open .estimator-toggle__chevron,
+.analytics-card--open .estimator-toggle__chevron,
+.api-parser-card--open .estimator-toggle__chevron,
+.templates-card--open .estimator-toggle__chevron,
+.planner-card--open .estimator-toggle__chevron,
+.replay-card--open .estimator-toggle__chevron,
+.pricing-card--open .estimator-toggle__chevron {
+  transform: rotate(180deg);
+}
+
+.compare-btn--active { box-shadow: 0 0 0 2px var(--accent-purple), 0 0 12px rgba(139, 92, 246, 0.3); }
+.dashboard-btn:active { transform: scale(0.96); }
+.stat-item__value { transition: color 0.3s ease; }
+.token-card__bar-fill { transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.timeline-bar { transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-hover-fx:hover, .preset-btn:hover { transform: none; }
+  .btn-pressed { transform: none !important; }
+  .estimator-toggle__chevron, .timeline-bar, .token-card__bar-fill { transition: none; }
+}
