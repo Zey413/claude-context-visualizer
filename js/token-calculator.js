@@ -175,11 +175,13 @@ var TokenCalculator = (function () {
 
     if (isCode && isCJK) {
       type = 'Mixed';
+    } else if (isCode && cjkCount > 0) {
+      type = 'Mixed';
     } else if (isCode) {
       type = 'Code';
     } else if (isCJK) {
       type = 'CJK';
-    } else if (cjkRatio > 0.05 || (isCode && cjkRatio > 0)) {
+    } else if (cjkRatio > 0.05) {
       type = 'Mixed';
     }
 
