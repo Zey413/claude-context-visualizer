@@ -104,6 +104,8 @@ body {
   height: 100%;
   pointer-events: none;
   z-index: 0;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .bg-noise {
@@ -152,6 +154,7 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   transition: border-color var(--transition-fast), background 300ms ease, color 300ms ease;
+  contain: layout style paint;
 }
 
 .glass-card:hover {
@@ -843,6 +846,8 @@ body {
   padding: 0;
   animation: fadeSlideIn 0.5s ease 0.42s both;
   overflow: hidden;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 50px;
 }
 
 .estimator-toggle {
@@ -1325,6 +1330,8 @@ body {
 .timeline-section {
   padding: 20px 24px;
   animation: fadeSlideIn 0.6s ease 0.48s both;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 150px;
 }
 
 .timeline-header {
@@ -2089,6 +2096,7 @@ body {
 .gauge-segment {
   transition: opacity var(--transition-fast);
   cursor: pointer;
+  will-change: transform, stroke-dasharray, stroke-dashoffset;
 }
 
 .gauge-segment:hover {
@@ -2466,6 +2474,7 @@ body {
   border-radius: 50%;
   opacity: 0;
   animation: confettiFall 1.5s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 @keyframes confettiFall {
