@@ -1212,6 +1212,22 @@
     if (typeof CostForecast !== 'undefined' && CostForecast.isInited()) {
       CostForecast.update(state.tokens, state.modelIndex);
     }
+
+    // ---- NEW v3.0: Feed data to new modules ----
+    if (typeof RealtimeMonitor !== 'undefined' && RealtimeMonitor.isInited && RealtimeMonitor.isInited()) {
+      RealtimeMonitor.update({
+        tokens: state.tokens,
+        contextWindow: CLAUDE_MODELS[state.modelIndex].contextWindow,
+        modelName: CLAUDE_MODELS[state.modelIndex].name
+      });
+    }
+    if (typeof AlertTimeline !== 'undefined' && AlertTimeline.isInited && AlertTimeline.isInited()) {
+      AlertTimeline.addDataPoint({
+        tokens: Object.assign({}, state.tokens),
+        contextWindow: CLAUDE_MODELS[state.modelIndex].contextWindow,
+        timestamp: Date.now()
+      });
+    }
   }
 
   // ---- Keyboard Shortcuts ----
@@ -2825,6 +2841,27 @@
     });
   }
 
+  // ---- New Module Toggle Helper (v3.0) ----
+  function initNewModuleToggle(moduleId) {
+    var toggle = document.getElementById(moduleId + '-toggle');
+    var body = document.getElementById(moduleId + '-body');
+    var section = document.getElementById(moduleId + '-section');
+    if (!toggle || !body || !section) return;
+
+    toggle.addEventListener('click', function () {
+      var isOpen = section.classList.contains(moduleId + '-section--open');
+      if (isOpen) {
+        section.classList.remove(moduleId + '-section--open');
+        body.style.display = 'none';
+        toggle.setAttribute('aria-expanded', 'false');
+      } else {
+        section.classList.add(moduleId + '-section--open');
+        body.style.display = 'block';
+        toggle.setAttribute('aria-expanded', 'true');
+      }
+    });
+  }
+
   // ---- Boot ----
   function init() {
     initModelSelect();
@@ -2852,6 +2889,27 @@
     initColorCycling();
     initLangSelector();
     initShareButtons();
+
+    // ---- NEW v3.0 Modules ----
+    initNewModuleToggle('realtime-monitor');
+    initNewModuleToggle('alert-timeline');
+    initNewModuleToggle('token-waterfall');
+
+    // Initialize Realtime Monitor
+    if (typeof RealtimeMonitor !== 'undefined') {
+      RealtimeMonitor.init('realtime-monitor-container');
+    }
+    // Initialize Alert Timeline
+    if (typeof AlertTimeline !== 'undefined') {
+      AlertTimeline.init('alert-timeline-container');
+    }
+    // Initialize Token Waterfall
+    if (typeof TokenWaterfall !== 'undefined') {
+      TokenWaterfall.init('token-waterfall-container', {
+        contextWindow: CLAUDE_MODELS[state.modelIndex].contextWindow,
+        maxTurns: 50
+      });
+    }
 
     // Load custom colors from localStorage
     loadColors();

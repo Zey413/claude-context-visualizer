@@ -1,16 +1,17 @@
 # Claude Context Window Visualizer
 
-![Version](https://img.shields.io/badge/version-2.2.0-8B5CF6)
+![Version](https://img.shields.io/badge/version-3.0.0-8B5CF6)
 ![HTML](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
 ![CSS](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
 ![No Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)
 ![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8?style=flat&logo=pwa&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-Interactive visualization of Claude's context window token usage. Features an animated SVG donut gauge, **all-model comparison dashboard**, **advanced charts (Pie/Radar/Trend)**, **Claude Code memory tracker**, **token flow stream animation**, model comparison mode, token estimator, API response parser, analytics panel, conversation simulator, usage timeline, and full internationalization -- all in a zero-dependency PWA with dark glassmorphism UI.
+Interactive visualization of Claude's context window token usage. Features an animated SVG donut gauge, **realtime context monitor**, **alert timeline with replay**, **token waterfall analysis**, **all-model comparison dashboard**, **advanced charts (Pie/Radar/Trend)**, **Claude Code memory tracker**, **token flow stream animation**, model comparison mode, token estimator, API response parser, analytics panel, conversation simulator, usage timeline, and full internationalization -- all in a zero-dependency PWA with dark glassmorphism UI.
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Claude-Context_Visualizer_v2-8B5CF6?style=for-the-badge" alt="Claude Context Visualizer v2"/>
+  <img src="https://img.shields.io/badge/Claude-Context_Visualizer_v3-8B5CF6?style=for-the-badge" alt="Claude Context Visualizer v3"/>
 </p>
 
 <p align="center">
@@ -18,6 +19,13 @@ Interactive visualization of Claude's context window token usage. Features an an
 </p>
 
 ---
+
+## What's New in v3.0
+
+- **Realtime Context Monitor** -- Live dashboard with Canvas ring gauge, consumption rate tracking, capacity prediction, and danger alerts. Parse Claude Code `/context` output directly or run live simulations.
+- **Alert Timeline & Replay** -- SVG stacked area timeline with 3-tier smart alerts (80%/90%/95%), toast notifications, replay controls with 4 speed settings, and draggable progress bar.
+- **Token Waterfall Analysis** -- Per-turn waterfall chart with cumulative overlay, click-to-expand detail panels, bulk JSON import, and staggered animation rendering.
+- **MIT License** -- Added proper LICENSE file to the repository.
 
 ## What's New in v2.2
 

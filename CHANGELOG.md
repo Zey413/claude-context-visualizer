@@ -5,6 +5,56 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-03-31
+
+### Added
+- **Realtime Context Monitor** (`realtime-monitor.js`, 33KB) — Live dashboard for monitoring Claude Code context window usage in real-time
+  - Canvas-based ring gauge with gradient colors (green->yellow->red)
+  - Horizontal bar charts for per-category token breakdown
+  - Token consumption rate indicator (tokens/min)
+  - Capacity prediction (estimated minutes until context window is full)
+  - Danger alerts with blinking animation at 80%/95% thresholds
+  - Rolling 60-point sparkline trend history
+  - Parse Claude Code `/context` command output directly
+  - Live simulation mode with configurable parameters
+
+- **Alert Timeline & Replay** (`alert-timeline.js`, 40KB) — SVG-based stacked area timeline with intelligent alert system
+  - Stacked area chart showing System/User/Assistant/Tools over time
+  - 3-tier threshold lines (80% warning, 90% danger, 95% critical)
+  - Toast notification system for context window alerts
+  - Replay controls with play/pause/reset and 4 speed settings (0.5x/1x/2x/4x)
+  - Draggable progress bar for timeline scrubbing
+  - Summary statistics: total tokens, avg per turn, peak usage, estimated remaining turns
+
+- **Token Waterfall Analysis** (`token-waterfall.js`, 34KB) — Per-turn waterfall/Gantt chart with detailed analysis
+  - Stacked horizontal bars for each conversation turn
+  - Cumulative usage curve overlay with gradient coloring
+  - Click-to-expand turn detail panel with breakdown pie chart
+  - Bulk JSON import for analyzing real conversation data
+  - Staggered row animation (100ms delay per row)
+  - Hover tooltips with detailed token statistics
+  - Export conversation data as JSON
+
+- **MIT LICENSE file** — Added missing license file (previously only mentioned in README)
+- **NEW badge** — Animated gradient badge on new feature sections
+- **Section description text** — Explanatory text for each new module
+
+### Changed
+- Service worker bumped to `ctx-viz-v11` with 3 new JS files cached
+- Footer version updated to v3.0.0
+- Footer keyboard shortcuts now include `D` for Dashboard
+- `app.js` updated with new module initialization and data pipeline
+  - `initNewModuleToggle()` helper for collapsible sections
+  - `render()` feeds live data to RealtimeMonitor and AlertTimeline
+- Added ~600 lines of new CSS for Realtime Monitor, Alert Timeline, and Token Waterfall sections
+
+### Technical
+- Total new code: ~107KB across 3 new modules
+- All modules follow existing IIFE pattern with `window.*` public API
+- Full dark/light theme support for all new components
+- Responsive design for mobile (breakpoints at 700px and 600px)
+- ARIA attributes and keyboard navigation support
+
 ## [2.2.0] - 2026-03-31
 
 ### Fixed

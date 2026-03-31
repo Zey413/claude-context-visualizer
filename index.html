@@ -915,6 +915,60 @@
       </div>
     </section>
 
+    <!-- ====== NEW: Realtime Context Monitor ====== -->
+    <section class="realtime-monitor-section glass-card scroll-reveal" id="realtime-monitor-section">
+      <button class="estimator-toggle" id="realtime-monitor-toggle" aria-expanded="false" aria-controls="realtime-monitor-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">📡</span>
+          <h3 class="estimator-toggle__title">Realtime Context Monitor</h3>
+          <span class="badge badge--new">NEW</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="realtime-monitor-body" id="realtime-monitor-body" style="display:none;">
+        <p class="section-desc">Paste your Claude Code <code>/context</code> output or start a live simulation to monitor context window usage in real-time.</p>
+        <div id="realtime-monitor-container"></div>
+      </div>
+    </section>
+
+    <!-- ====== NEW: Alert Timeline ====== -->
+    <section class="alert-timeline-section glass-card scroll-reveal" id="alert-timeline-section">
+      <button class="estimator-toggle" id="alert-timeline-toggle" aria-expanded="false" aria-controls="alert-timeline-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">⏱️</span>
+          <h3 class="estimator-toggle__title">Context Timeline & Alerts</h3>
+          <span class="badge badge--new">NEW</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="alert-timeline-body" id="alert-timeline-body" style="display:none;">
+        <p class="section-desc">Visualize context window usage over time with intelligent alerts when approaching capacity limits.</p>
+        <div id="alert-timeline-container"></div>
+      </div>
+    </section>
+
+    <!-- ====== NEW: Token Waterfall Analysis ====== -->
+    <section class="token-waterfall-section glass-card scroll-reveal" id="token-waterfall-section">
+      <button class="estimator-toggle" id="token-waterfall-toggle" aria-expanded="false" aria-controls="token-waterfall-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">🌊</span>
+          <h3 class="estimator-toggle__title">Token Waterfall Analysis</h3>
+          <span class="badge badge--new">NEW</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="token-waterfall-body" id="token-waterfall-body" style="display:none;">
+        <p class="section-desc">Waterfall chart showing token distribution across conversation turns with cumulative growth overlay.</p>
+        <div id="token-waterfall-container"></div>
+      </div>
+    </section>
+
     <!-- Conversation Replay -->
     <section class="replay-card glass-card" id="replay-card">
       <button class="estimator-toggle" id="replay-toggle" aria-expanded="false" aria-controls="replay-body">
@@ -988,8 +1042,8 @@
           <option value="ja">日本語</option>
         </select>
       </div>
-      <p>Built with ✨ by <a href="https://github.com/Zey413" target="_blank" rel="noopener">@Zey413</a> <span class="footer__version">v1.0.0</span></p>
-      <p class="footer__hint">Keyboard: <kbd>R</kbd> Reset &middot; <kbd>1</kbd>-<kbd>4</kbd> Presets &middot; <kbd>C</kbd> Compare &middot; <kbd>T</kbd> Theme</p>
+      <p>Built with ✨ by <a href="https://github.com/Zey413" target="_blank" rel="noopener">@Zey413</a> <span class="footer__version">v3.0.0</span></p>
+      <p class="footer__hint">Keyboard: <kbd>R</kbd> Reset &middot; <kbd>1</kbd>-<kbd>4</kbd> Presets &middot; <kbd>C</kbd> Compare &middot; <kbd>D</kbd> Dashboard &middot; <kbd>T</kbd> Theme</p>
     </footer>
   </div>
 
@@ -1008,6 +1062,9 @@
   <script src="js/cache-viz.js"></script>
   <script src="js/cost-forecast.js"></script>
   <script src="js/scroll-fx.js"></script>
+  <script src="js/realtime-monitor.js"></script>
+  <script src="js/alert-timeline.js"></script>
+  <script src="js/token-waterfall.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

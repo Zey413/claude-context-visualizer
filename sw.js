@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ctx-viz-v10';
+const CACHE_NAME = 'ctx-viz-v11';
 const ASSETS = [
   './',
   './index.html',
@@ -17,11 +17,15 @@ const ASSETS = [
   './js/cache-viz.js',
   './js/cost-forecast.js',
   './js/scroll-fx.js',
+  './js/realtime-monitor.js',
+  './js/alert-timeline.js',
+  './js/token-waterfall.js',
   './js/app.js',
   './assets/favicon.svg',
   './manifest.json',
   './robots.txt',
-  './sitemap.xml'
+  './sitemap.xml',
+  './LICENSE'
 ];
 
 // Install: pre-cache all static assets
