@@ -318,6 +318,55 @@
           </div>
         </div>
 
+        <!-- Claude Code Memory Tracker -->
+        <div class="memory-card glass-card" id="memory-card">
+          <button class="estimator-toggle" id="memory-toggle" aria-expanded="false" aria-controls="memory-body">
+            <div class="estimator-toggle__left">
+              <span class="estimator-toggle__icon" aria-hidden="true">\uD83E\uDDE0</span>
+              <h3 class="estimator-toggle__title">Claude Code Memory</h3>
+            </div>
+            <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="memory-body" id="memory-body">
+            <div class="memory-breakdown" id="memory-breakdown">
+              <!-- Rendered by JS -->
+            </div>
+
+            <div class="memory-sim" id="memory-sim">
+              <h4 class="memory-sim__title">\u25B6 Session Simulator</h4>
+              <div class="memory-sim__controls">
+                <div class="select-wrapper memory-sim__select-wrapper">
+                  <select id="memory-scenario" class="memory-sim__select" aria-label="Select simulation scenario">
+                    <!-- Populated by JS -->
+                  </select>
+                  <span class="select-arrow" aria-hidden="true">\u25BE</span>
+                </div>
+                <button class="memory-sim__btn" id="memory-play" title="Play simulation">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21"/></svg>
+                  Play
+                </button>
+                <button class="memory-sim__btn" id="memory-pause" title="Pause simulation" style="display:none">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                  Pause
+                </button>
+                <button class="memory-sim__btn memory-sim__btn--secondary" id="memory-reset" title="Reset simulation">Reset</button>
+              </div>
+              <div class="memory-sim-bar-wrapper">
+                <div class="memory-sim-bar" id="memory-sim-bar"></div>
+              </div>
+              <div class="memory-sim__meta">
+                <span id="memory-sim-total"></span>
+                <span id="memory-sim-progress"></span>
+              </div>
+              <div class="memory-sim-log" id="memory-sim-log">
+                <div class="memory-sim-log__empty">Press Play to simulate a session</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Token Estimator -->
         <div class="estimator-card glass-card" id="estimator-card">
           <button class="estimator-toggle" id="estimator-toggle" aria-expanded="false" aria-controls="estimator-body">
@@ -874,6 +923,7 @@
   <script src="js/share.js"></script>
   <script src="js/dashboard.js"></script>
   <script src="js/charts.js"></script>
+  <script src="js/memory-tracker.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

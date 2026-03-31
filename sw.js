@@ -10,6 +10,7 @@ const ASSETS = [
   './js/share.js',
   './js/dashboard.js',
   './js/charts.js',
+  './js/memory-tracker.js',
   './js/app.js',
   './assets/favicon.svg',
   './manifest.json',

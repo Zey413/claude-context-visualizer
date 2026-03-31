@@ -2736,6 +2736,13 @@
     log.scrollTop = log.scrollHeight;
   }
 
+  // ---- Memory Tracker ----
+  function initMemoryTracker() {
+    if (typeof MemoryTracker !== 'undefined') {
+      MemoryTracker.init();
+    }
+  }
+
   // ---- Charts ----
   function initCharts() {
     if (typeof Charts !== 'undefined') {
@@ -2763,6 +2770,7 @@
     initCompareMode();
     initDashboard();
     initCharts();
+    initMemoryTracker();
     initEstimator();
     initAnalytics();
     initPricing();
