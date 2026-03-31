@@ -303,6 +303,7 @@ class GaugeRenderer {
    * in category order: [system, user, assistant, tools].
    */
   setSegmentColors(colors) {
+    if (!this.container) return;
     const cats = ['system', 'user', 'assistant', 'tools'];
     cats.forEach((cat, i) => {
       if (this.segments[cat] && colors[i]) {
