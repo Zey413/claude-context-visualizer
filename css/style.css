@@ -615,6 +615,19 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.token-card__sparkline {
+  height: 24px;
+  width: 100%;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.token-card__sparkline svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 /* --- Sliders Card --- */
 .sliders-card {
   padding: 20px;

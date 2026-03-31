@@ -422,13 +422,13 @@ const I18n = (function () {
     }
 
     // Footer
-    const footerP = document.querySelector('.footer > p:first-child');
-    if (footerP) {
-      const link = footerP.querySelector('a');
+    const footerParagraphs = document.querySelectorAll('.footer > p');
+    footerParagraphs.forEach(p => {
+      const link = p.querySelector('a[href*="Zey413"]');
       if (link) {
-        footerP.innerHTML = t('footerBuiltWith') + ' <a href="https://github.com/Zey413" target="_blank" rel="noopener">@Zey413</a>';
+        p.innerHTML = t('footerBuiltWith') + ' <a href="https://github.com/Zey413" target="_blank" rel="noopener">@Zey413</a>';
       }
-    }
+    });
 
     const footerHint = document.querySelector('.footer__hint');
     if (footerHint) {
@@ -469,9 +469,26 @@ const I18n = (function () {
   }
 
   /**
-   * Build the language selector dropdown in the footer area.
+   * Initialize the language selector dropdown in the footer area.
+   * Uses the existing #lang-select element if present, otherwise creates one.
    */
   function buildLanguageSelector() {
+    // Try to use the existing lang-select in the HTML
+    const existingSelect = document.getElementById('lang-select');
+    if (existingSelect) {
+      existingSelect.value = currentLang;
+      existingSelect.setAttribute('aria-label', t('language'));
+      // Only add listener if not already attached
+      if (!existingSelect.dataset.i18nBound) {
+        existingSelect.addEventListener('change', () => {
+          setLanguage(existingSelect.value);
+        });
+        existingSelect.dataset.i18nBound = 'true';
+      }
+      return;
+    }
+
+    // Fallback: create a language selector dynamically
     const footer = document.querySelector('.footer');
     if (!footer) return;
 
@@ -483,7 +500,7 @@ const I18n = (function () {
     wrapper.classList.add('lang-selector-wrapper');
 
     const label = document.createElement('label');
-    label.setAttribute('for', 'lang-select');
+    label.setAttribute('for', 'lang-select-dynamic');
     label.classList.add('lang-selector-label');
     label.textContent = '\uD83C\uDF10';
     label.setAttribute('aria-label', t('language'));
@@ -492,7 +509,7 @@ const I18n = (function () {
     selectWrap.classList.add('select-wrapper', 'lang-select-wrapper');
 
     const select = document.createElement('select');
-    select.id = 'lang-select';
+    select.id = 'lang-select-dynamic';
     select.classList.add('lang-select');
     select.setAttribute('aria-label', t('language'));
 
@@ -530,10 +547,17 @@ const I18n = (function () {
    * Update the language selector to reflect the current language.
    */
   function updateLanguageSelector() {
+    // Update existing HTML select
     const select = document.getElementById('lang-select');
     if (select) {
       select.value = currentLang;
       select.setAttribute('aria-label', t('language'));
+    }
+    // Update dynamically-created select if present
+    const dynamicSelect = document.getElementById('lang-select-dynamic');
+    if (dynamicSelect) {
+      dynamicSelect.value = currentLang;
+      dynamicSelect.setAttribute('aria-label', t('language'));
     }
     const label = document.querySelector('.lang-selector-label');
     if (label) label.setAttribute('aria-label', t('language'));

@@ -18,7 +18,19 @@
   };
 
   const STORAGE_KEY = 'claude-ctx-viz';
+  const COLORS_KEY = 'claude-ctx-colors';
   const MAX_TIMELINE = 10;
+
+  // Preset color palettes users can cycle through per category
+  const COLOR_PRESETS = {
+    system:    ['#8B5CF6', '#A855F7', '#D946EF', '#6D28D9', '#7C3AED'],
+    user:      ['#3B82F6', '#6366F1', '#0EA5E9', '#2563EB', '#0284C7'],
+    assistant: ['#10B981', '#34D399', '#14B8A6', '#059669', '#22C55E'],
+    tools:     ['#F59E0B', '#F97316', '#EAB308', '#D97706', '#FB923C'],
+  };
+
+  // Track whether we were previously in danger zone (for shake trigger)
+  let _wasDanger = false;
 
   // ---- DOM References ----
   const modelSelect = document.getElementById('model-select');
@@ -42,6 +54,12 @@
   const percentEls = {};
 
   const categories = ['system', 'user', 'assistant', 'tools'];
+  const SPARKLINE_COLORS = {
+    system: '#8B5CF6',
+    user: '#3B82F6',
+    assistant: '#10B981',
+    tools: '#F59E0B',
+  };
   categories.forEach(cat => {
     sliders[cat] = document.getElementById(`slider-${cat}`);
     inputs[cat] = document.getElementById(`input-${cat}`);
@@ -289,6 +307,67 @@
 
       timelineChart.appendChild(bar);
     });
+
+    renderSparklines();
+  }
+
+  // ---- Sparklines ----
+  function renderSparklines() {
+    const snapshots = state.timeline;
+
+    categories.forEach(cat => {
+      const container = document.getElementById(`${cat}-sparkline`);
+      if (!container) return;
+
+      const color = SPARKLINE_COLORS[cat];
+      const gradId = `spark-grad-${cat}`;
+
+      // Get last 10 values for this category
+      const last10 = snapshots.slice(-MAX_TIMELINE);
+      const values = last10.map(s => s.tokens[cat] || 0);
+
+      // SVG dimensions (viewBox coordinates)
+      const W = 100;
+      const H = 24;
+      const padY = 2; // vertical padding so line doesn't clip edges
+
+      // If no data or all zeros, draw a flat baseline
+      if (values.length === 0) {
+        container.innerHTML =
+          `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">` +
+            `<line x1="0" y1="${H - padY}" x2="${W}" y2="${H - padY}" stroke="${color}" stroke-opacity="0.25" stroke-width="1" />` +
+          `</svg>`;
+        return;
+      }
+
+      const maxVal = Math.max(...values, 1); // avoid division by zero
+      const count = values.length;
+
+      // Compute points
+      const points = values.map((v, i) => {
+        const x = count === 1 ? W / 2 : (i / (count - 1)) * W;
+        const y = padY + (H - 2 * padY) * (1 - v / maxVal);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      });
+
+      const polylineStr = points.join(' ');
+      // Closed polygon for the gradient fill area (goes down to bottom-right, then bottom-left)
+      const firstX = count === 1 ? (W / 2).toFixed(1) : '0.0';
+      const lastX = count === 1 ? (W / 2).toFixed(1) : W.toFixed(1);
+      const fillStr = `${polylineStr} ${lastX},${H} ${firstX},${H}`;
+
+      container.innerHTML =
+        `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">` +
+          `<defs>` +
+            `<linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">` +
+              `<stop offset="0%" stop-color="${color}" stop-opacity="0.25" />` +
+              `<stop offset="100%" stop-color="${color}" stop-opacity="0" />` +
+            `</linearGradient>` +
+          `</defs>` +
+          `<polygon points="${fillStr}" fill="url(#${gradId})" />` +
+          `<polyline points="${polylineStr}" fill="none" stroke="${color}" stroke-opacity="0.6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />` +
+        `</svg>`;
+    });
   }
 
   // ---- Comparison Mode ----
@@ -420,6 +499,9 @@
       }
     });
 
+    // Update sparklines
+    renderSparklines();
+
     // Stats bar
     statTotalUsed.textContent = formatNumber(total);
     statRemaining.textContent = formatNumber(Math.max(0, model.contextWindow - total));
@@ -457,7 +539,7 @@
   function initKeyboard() {
     document.addEventListener('keydown', (e) => {
       // Don't trigger when typing in inputs
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
 
       if (e.key === 'r' || e.key === 'R') {
         resetState();
