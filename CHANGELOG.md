@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-03-31
+
+### Added
+- **Context Compaction Simulator** (`compaction-sim.js`) — Visualize `/compact` command effects
+  - Before/after comparison with animated transition
+  - 4 compaction strategies: Balanced, Keep System, Keep Recent, Minimize Tools
+  - Configurable compression ratio (20%-80%)
+  - Intelligent recommendations based on token distribution
+
+- **Model Cost Heatmap** (`model-heatmap.js`) — Interactive cost comparison matrix
+  - 5 usage scenarios × 8 Claude models
+  - HSL color gradient from green (cheap) to red (expensive)
+  - "Best Value" and "Recommended" badges
+  - Sortable columns and generation filters
+
+- **Demo Data Seeding** — First-time visitors now see pre-filled sample data
+  - Token Waterfall loaded with "Coding Session" scenario (via DataGenerator)
+  - Alert Timeline seeded with 5 progressive data points
+
+### Fixed
+- **Emoji display** — Replaced Unicode surrogate pair escapes with actual emoji characters in all JS files
+  - Fixed `\uD83D\uDCBB` → 💻, `\uD83C\uDFA7` → 🎧, etc. across app.js, data-generator.js, models.js
+
+### Improved
+- **Mobile responsiveness** — 250+ lines of new responsive CSS
+  - Touch target optimization (44px minimum)
+  - New `@media (max-width: 480px)` rules for all v3.0 modules
+  - Touch scrolling with `-webkit-overflow-scrolling: touch`
+  - Landscape mode optimizations
+  - Collapsible panel border hints
+- Service worker bumped to v12
+
 ## [3.0.0] - 2026-03-31
 
 ### Added

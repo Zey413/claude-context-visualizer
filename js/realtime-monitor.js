@@ -746,10 +746,10 @@
     var alert = _els.alert;
     if (percent >= DANGER_THRESHOLD) {
       alert.className = 'rtm__alert rtm__alert--danger';
-      alert.textContent = '\u26A0\uFE0F CRITICAL: Context window is ' + Math.round(percent) + '% full! Tokens will be truncated soon.';
+      alert.textContent = '⚠️ CRITICAL: Context window is ' + Math.round(percent) + '% full! Tokens will be truncated soon.';
     } else if (percent >= WARN_THRESHOLD) {
       alert.className = 'rtm__alert rtm__alert--warn';
-      alert.textContent = '\u26A0 Warning: Context window usage at ' + Math.round(percent) + '%. Consider summarizing or resetting context.';
+      alert.textContent = '⚠ Warning: Context window usage at ' + Math.round(percent) + '%. Consider summarizing or resetting context.';
     } else {
       alert.className = 'rtm__alert rtm__alert--hidden';
     }

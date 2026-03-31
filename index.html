@@ -972,6 +972,42 @@
       </div>
     </section>
 
+    <!-- ====== NEW v3.1: Compaction Simulator ====== -->
+    <section class="compaction-sim-section glass-card scroll-reveal" id="compaction-sim-section">
+      <button class="estimator-toggle" id="compaction-sim-toggle" aria-expanded="false" aria-controls="compaction-sim-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">🗜️</span>
+          <h3 class="estimator-toggle__title">Context Compaction Simulator</h3>
+          <span class="badge badge--new">NEW</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="compaction-sim-body" id="compaction-sim-body" style="display:none;">
+        <p class="section-desc">Simulate the effect of Claude Code's <code>/compact</code> command. Visualize token reduction across categories with different compaction strategies.</p>
+        <div id="compaction-sim-container"></div>
+      </div>
+    </section>
+
+    <!-- ====== NEW v3.1: Model Cost Heatmap ====== -->
+    <section class="model-heatmap-section glass-card scroll-reveal" id="model-heatmap-section">
+      <button class="estimator-toggle" id="model-heatmap-toggle" aria-expanded="false" aria-controls="model-heatmap-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">🗺️</span>
+          <h3 class="estimator-toggle__title">Model Cost Heatmap</h3>
+          <span class="badge badge--new">NEW</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="model-heatmap-body" id="model-heatmap-body" style="display:none;">
+        <p class="section-desc">Interactive heatmap comparing request costs across all Claude models and usage scenarios. Color-coded from green (cheapest) to red (most expensive).</p>
+        <div id="model-heatmap-container"></div>
+      </div>
+    </section>
+
     <!-- Conversation Replay -->
     <section class="replay-card glass-card" id="replay-card">
       <button class="estimator-toggle" id="replay-toggle" aria-expanded="false" aria-controls="replay-body">
@@ -1069,6 +1105,8 @@
   <script src="js/realtime-monitor.js" defer></script>
   <script src="js/alert-timeline.js" defer></script>
   <script src="js/token-waterfall.js" defer></script>
+  <script src="js/compaction-sim.js" defer></script>
+  <script src="js/model-heatmap.js" defer></script>
   <script src="js/app.js" defer></script>
   <script>
     if ('serviceWorker' in navigator) {

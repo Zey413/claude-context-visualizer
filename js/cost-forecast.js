@@ -41,7 +41,7 @@ var CostForecast = (function () {
       '</div>' +
       '<div class="forecast-projections" id="forecast-projections"></div>' +
       '<h4 style="font-size:0.85rem;color:var(--text-secondary);margin:0.5rem 0 0.3rem">' +
-        '\uD83D\uDCCA Monthly Cost by Model</h4>' +
+        '📊 Monthly Cost by Model</h4>' +
       '<div class="forecast-model-bars" id="forecast-model-bars"></div>' +
       '<div class="forecast-budget" id="forecast-budget-bar"></div>' +
       '<div class="forecast-recommendation" id="forecast-rec"></div>';
@@ -105,7 +105,7 @@ var CostForecast = (function () {
         var isActive = i === modelIndex;
         var isCheapest = i === cheapestIdx;
         var nameStyle = isActive ? 'color:var(--accent-purple);font-weight:600' : '';
-        var badge = isCheapest ? ' \u2705' : '';
+        var badge = isCheapest ? ' ✅' : '';
         return '<div class="forecast-model-bar">' +
           '<span class="forecast-model-bar__name" style="' + nameStyle + '">' +
             mc.name + badge +
@@ -122,7 +122,7 @@ var CostForecast = (function () {
       if (recEl && maxCost > 0) {
         var cheapest = modelCosts[cheapestIdx];
         var savingsPct = maxCost > 0 ? Math.round((1 - cheapest.cost / maxCost) * 100) : 0;
-        recEl.innerHTML = '\uD83D\uDCA1 <strong>' + cheapest.name + '</strong> is the best value at <strong>$' +
+        recEl.innerHTML = '💡 <strong>' + cheapest.name + '</strong> is the best value at <strong>$' +
           cheapest.cost.toFixed(2) + '/mo</strong>' +
           (savingsPct > 0 ? ' (' + savingsPct + '% cheaper than most expensive)' : '');
       }
@@ -138,7 +138,7 @@ var CostForecast = (function () {
                        budgetPct < 90 ? 'Approaching limit' : 'Over budget!';
 
       budgetEl.innerHTML =
-        '<span class="forecast-budget__text">\uD83D\uDCB0 Budget:</span>' +
+        '<span class="forecast-budget__text">💰 Budget:</span>' +
         '<div class="forecast-budget__bar">' +
           '<div class="forecast-budget__fill" style="width:' + budgetPct.toFixed(1) + '%;background:' + barColor + '"></div>' +
         '</div>' +

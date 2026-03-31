@@ -642,7 +642,7 @@ const I18n = (function () {
     const label = document.createElement('label');
     label.setAttribute('for', 'lang-select-dynamic');
     label.classList.add('lang-selector-label');
-    label.textContent = '\uD83C\uDF10';
+    label.textContent = '🌐';
     label.setAttribute('aria-label', t('language'));
 
     const selectWrap = document.createElement('div');

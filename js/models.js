@@ -132,28 +132,28 @@ const TOKEN_CATEGORIES = [
     id: 'system',
     label: 'System Prompt',
     color: '#8B5CF6',
-    icon: '\u2699\uFE0F',
+    icon: '⚙️',
     description: 'System instructions and context'
   },
   {
     id: 'user',
     label: 'User Messages',
     color: '#3B82F6',
-    icon: '\uD83D\uDC64',
+    icon: '👤',
     description: 'User input and queries'
   },
   {
     id: 'assistant',
     label: 'Assistant Output',
     color: '#10B981',
-    icon: '\uD83E\uDD16',
+    icon: '🤖',
     description: 'Claude\'s responses'
   },
   {
     id: 'tools',
     label: 'Tool Use',
     color: '#F59E0B',
-    icon: '\uD83D\uDD27',
+    icon: '🔧',
     description: 'Tool calls, results, and schemas'
   }
 ];
@@ -165,28 +165,28 @@ const PRESETS = [
   {
     id: 'light-chat',
     name: 'Light Chat',
-    icon: '\uD83D\uDCAC',
+    icon: '💬',
     description: 'Simple conversation',
     allocation: { system: 0.02, user: 0.05, assistant: 0.08, tools: 0.0 }
   },
   {
     id: 'long-conversation',
     name: 'Long Conversation',
-    icon: '\uD83D\uDCDC',
+    icon: '📜',
     description: 'Extended multi-turn dialogue',
     allocation: { system: 0.03, user: 0.25, assistant: 0.35, tools: 0.02 }
   },
   {
     id: 'tool-heavy',
     name: 'Tool-Heavy Agent',
-    icon: '\uD83D\uDEE0\uFE0F',
+    icon: '🛠️',
     description: 'Agent with many tool calls',
     allocation: { system: 0.05, user: 0.10, assistant: 0.20, tools: 0.35 }
   },
   {
     id: 'near-limit',
     name: 'Near Limit',
-    icon: '\uD83D\uDD25',
+    icon: '🔥',
     description: 'Context window almost full',
     allocation: { system: 0.04, user: 0.30, assistant: 0.40, tools: 0.18 }
   }

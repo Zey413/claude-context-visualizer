@@ -39,7 +39,7 @@ const Dashboard = (function () {
     var header = document.createElement('div');
     header.className = 'dashboard__header';
     header.innerHTML =
-      '<h2 class="dashboard__title">\uD83D\uDCCA All-Model Comparison</h2>' +
+      '<h2 class="dashboard__title">📊 All-Model Comparison</h2>' +
       '<button class="dashboard__close-btn" id="dashboard-close" aria-label="Close dashboard">&times;</button>';
     _overlay.appendChild(header);
 
@@ -85,7 +85,7 @@ const Dashboard = (function () {
     var tokens = state.tokens;
     var categories = ['system', 'user', 'assistant', 'tools'];
     var catColors = { system: '#8B5CF6', user: '#3B82F6', assistant: '#10B981', tools: '#F59E0B' };
-    var catIcons = { system: '\u2699\uFE0F', user: '\uD83D\uDC64', assistant: '\uD83E\uDD16', tools: '\uD83D\uDD27' };
+    var catIcons = { system: '⚙️', user: '👤', assistant: '🤖', tools: '🔧' };
     var totalTokens = categories.reduce(function (s, c) { return s + (tokens[c] || 0); }, 0);
 
     // Find max context window for proportional scaling
@@ -190,9 +190,9 @@ const Dashboard = (function () {
       var fitsModels = CLAUDE_MODELS.filter(function (m) { return totalTokens <= m.contextWindow; });
       summaryEl.innerHTML =
         '<div class="dashboard__summary-row">' +
-          '<span>\uD83D\uDCE6 Current usage: <strong>' + formatNumber(totalTokens) + ' tokens</strong></span>' +
-          '<span>\u2705 Fits in: <strong>' + fitsModels.length + '/' + CLAUDE_MODELS.length + ' models</strong></span>' +
-          '<span>\uD83D\uDCB0 Best value: <strong>' + cheapestModel.name + '</strong> ($' + cheapest.cost.toFixed(4) + ')</span>' +
+          '<span>📦 Current usage: <strong>' + formatNumber(totalTokens) + ' tokens</strong></span>' +
+          '<span>✅ Fits in: <strong>' + fitsModels.length + '/' + CLAUDE_MODELS.length + ' models</strong></span>' +
+          '<span>💰 Best value: <strong>' + cheapestModel.name + '</strong> ($' + cheapest.cost.toFixed(4) + ')</span>' +
         '</div>';
     } else if (summaryEl) {
       summaryEl.innerHTML =

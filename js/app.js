@@ -59,7 +59,7 @@
     {
       id: 'coding-assistant',
       name: 'Coding Assistant',
-      icon: '\uD83D\uDCBB',
+      icon: '💻',
       description: 'Full-stack dev with code review capabilities',
       systemTokens: 1200,
       avgUserTokens: 800,
@@ -69,7 +69,7 @@
     {
       id: 'customer-support',
       name: 'Customer Support',
-      icon: '\uD83C\uDFA7',
+      icon: '🎧',
       description: 'Help desk agent with knowledge base',
       systemTokens: 2500,
       avgUserTokens: 300,
@@ -79,7 +79,7 @@
     {
       id: 'data-analyst',
       name: 'Data Analyst',
-      icon: '\uD83D\uDCCA',
+      icon: '📊',
       description: 'SQL generation and data interpretation',
       systemTokens: 1800,
       avgUserTokens: 500,
@@ -89,7 +89,7 @@
     {
       id: 'creative-writer',
       name: 'Creative Writer',
-      icon: '\u270D\uFE0F',
+      icon: '✍️',
       description: 'Long-form content generation',
       systemTokens: 800,
       avgUserTokens: 400,
@@ -99,7 +99,7 @@
     {
       id: 'rag-agent',
       name: 'RAG Agent',
-      icon: '\uD83D\uDD0D',
+      icon: '🔍',
       description: 'Retrieval-augmented generation with large context',
       systemTokens: 3000,
       avgUserTokens: 15000,
@@ -109,7 +109,7 @@
     {
       id: 'claude-code',
       name: 'Claude Code',
-      icon: '\uD83E\uDD16',
+      icon: '🤖',
       description: 'Autonomous coding agent with many tool calls',
       systemTokens: 5000,
       avgUserTokens: 3000,
@@ -1227,6 +1227,16 @@
         contextWindow: CLAUDE_MODELS[state.modelIndex].contextWindow,
         timestamp: Date.now()
       });
+    }
+
+    // ---- v3.1: Feed data to Compaction Simulator ----
+    if (typeof CompactionSim !== 'undefined' && CompactionSim.isInited && CompactionSim.isInited()) {
+      CompactionSim.setTokens(state.tokens, CLAUDE_MODELS[state.modelIndex].contextWindow);
+    }
+
+    // ---- v3.1: Update Model Heatmap ----
+    if (typeof ModelHeatmap !== 'undefined' && ModelHeatmap.isInited && ModelHeatmap.isInited()) {
+      ModelHeatmap.update(state.tokens, state.modelIndex);
     }
   }
 
@@ -2946,6 +2956,59 @@
 
     // Show onboarding tooltip on first visit
     initOnboardingTooltip();
+
+    // ---- v3.1: Seed demo data into new modules on first visit ----
+    seedDemoDataIfFirstVisit();
+
+    // ---- v3.1: Initialize Compaction Simulator ----
+    initNewModuleToggle('compaction-sim');
+    if (typeof CompactionSim !== 'undefined') {
+      CompactionSim.init('compaction-sim-container');
+    }
+
+    // ---- v3.1: Initialize Model Heatmap ----
+    initNewModuleToggle('model-heatmap');
+    if (typeof ModelHeatmap !== 'undefined') {
+      ModelHeatmap.init('model-heatmap-container');
+    }
+  }
+
+  // ---- Demo Data Seeding (v3.1) ----
+  function seedDemoDataIfFirstVisit() {
+    var DEMO_KEY = 'claude-ctx-demo-seeded-v3';
+    try {
+      if (localStorage.getItem(DEMO_KEY)) return;
+    } catch (e) { return; }
+
+    // Seed Token Waterfall with sample data
+    if (typeof TokenWaterfall !== 'undefined' && typeof DataGenerator !== 'undefined') {
+      var sampleData = DataGenerator.generate('coding-session',
+        CLAUDE_MODELS[state.modelIndex].contextWindow, 42);
+      if (sampleData && sampleData.length > 0) {
+        TokenWaterfall.importData(sampleData);
+      }
+    }
+
+    // Seed Alert Timeline with a few initial data points
+    if (typeof AlertTimeline !== 'undefined' && AlertTimeline.isInited && AlertTimeline.isInited()) {
+      var demoPoints = [
+        { system: 1200, user: 800,  assistant: 2000, tools: 500 },
+        { system: 1200, user: 1600, assistant: 4500, tools: 1200 },
+        { system: 1200, user: 2400, assistant: 7000, tools: 2800 },
+        { system: 1200, user: 3200, assistant: 9500, tools: 4500 },
+        { system: 1200, user: 4000, assistant: 12000, tools: 6200 },
+      ];
+      var ctxWin = CLAUDE_MODELS[state.modelIndex].contextWindow;
+      for (var i = 0; i < demoPoints.length; i++) {
+        AlertTimeline.addDataPoint({
+          tokens: demoPoints[i],
+          contextWindow: ctxWin,
+          timestamp: Date.now() - (demoPoints.length - i) * 60000
+        });
+      }
+    }
+
+    try { localStorage.setItem(DEMO_KEY, '1'); } catch (e) { /* ignore */ }
   }
 
   // ---- Theme Toggle ----

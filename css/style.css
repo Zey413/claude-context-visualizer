@@ -5651,3 +5651,397 @@ button:focus-visible, select:focus-visible, input:focus-visible {
 @media (max-width: 600px) {
   .twf-detail-grid { grid-template-columns: 1fr; }
 }
+
+/* =========================================
+   Compaction Simulator Section
+   ========================================= */
+.compaction-sim-section { contain: layout; }
+.compaction-sim-section--open .compaction-sim-body { display: block !important; }
+.compaction-sim-section--open .estimator-toggle__chevron { transform: rotate(180deg); }
+
+/* =========================================
+   Model Heatmap Section
+   ========================================= */
+.model-heatmap-section { contain: layout; }
+.model-heatmap-section--open .model-heatmap-body { display: block !important; }
+.model-heatmap-section--open .estimator-toggle__chevron { transform: rotate(180deg); }
+
+/* =========================================
+   Mobile & Touch Optimizations
+   ========================================= */
+
+/* --- 1. Global Touch Target Optimization --- */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch targets for buttons */
+  .preset-btn,
+  .action-btn,
+  .compare-btn,
+  .estimator-add-btn,
+  .api-parser-btn,
+  .planner-apply-btn,
+  .rtm-btn,
+  .atl-btn,
+  .twf-btn,
+  .template-card__apply-btn,
+  .theme-toggle,
+  .theme-toggle-btn,
+  .dashboard-btn,
+  .dashboard__close-btn,
+  .onboarding-tooltip__btn,
+  .atl-speed-btn,
+  .memory-sim__btn,
+  .charts-tab {
+    min-height: 44px;
+  }
+
+  /* Increase slider thumb for easier grip */
+  .token-slider::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  .token-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cache-slider-range::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cache-slider-range::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Increase select touch target */
+  .model-select,
+  .model-select--compare,
+  .estimator-add-select,
+  .replay-scenario-select,
+  .lang-select,
+  .memory-sim__select {
+    min-height: 44px;
+  }
+
+  /* Increase toggle click area */
+  .estimator-toggle {
+    min-height: 48px;
+    padding: 14px 20px;
+  }
+
+  /* Larger heatmap cells for touch */
+  .heatmap__cell {
+    width: 20px;
+    height: 20px;
+  }
+
+  .heatmap__grid {
+    grid-template-columns: repeat(auto-fill, 20px);
+    gap: 3px;
+  }
+
+  /* Disable hover-only effects on touch devices */
+  .token-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .preset-btn:hover,
+  .action-btn:hover,
+  .estimator-chip:hover {
+    transform: none;
+  }
+
+  .timeline-bar:hover {
+    filter: none;
+    transform: none;
+  }
+
+  .heatmap__cell:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* --- 2. New Module Mobile Adaptation (480px) --- */
+@media (max-width: 480px) {
+  /* Realtime Monitor: single column top row */
+  .rtm-top-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Realtime Monitor: 2 columns stats */
+  .rtm-stats-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Realtime Monitor: shrink canvas gauge */
+  .rtm-canvas {
+    width: 160px;
+    height: 160px;
+  }
+
+  /* Realtime Monitor: compact bar labels */
+  .rtm-bar-label {
+    width: 55px;
+    font-size: 0.68rem;
+  }
+
+  .rtm-bar-value {
+    width: 45px;
+    font-size: 0.68rem;
+  }
+
+  /* Alert Timeline: 2 columns stats */
+  .atl-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Alert Timeline: vertical controls, full-width buttons */
+  .atl-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .atl-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .atl-speed-group {
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  /* Alert Timeline: compact chart */
+  .atl-chart-wrapper {
+    min-height: 180px;
+    padding: 0.5rem;
+  }
+
+  .atl-svg {
+    height: 160px;
+  }
+
+  /* Token Waterfall: hide row numbers to save space */
+  .twf-row-num {
+    display: none;
+  }
+
+  /* Token Waterfall: detail grid single column */
+  .twf-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Token Waterfall: adjust detail panel margin */
+  .twf-detail {
+    margin-left: 0;
+  }
+
+  /* Token Waterfall: compact rows */
+  .twf-row-total {
+    width: 50px;
+    font-size: 0.65rem;
+  }
+
+  /* Charts module: compact view */
+  .charts-tabs {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .charts-tab {
+    flex: 1;
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  /* Memory tracker: compact sim controls */
+  .memory-sim__controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .memory-sim__btn {
+    justify-content: center;
+  }
+
+  .memory-sim__select-wrapper {
+    min-width: 100%;
+  }
+
+  /* Cache card: single column sliders */
+  .cache-sliders {
+    grid-template-columns: 1fr;
+  }
+
+  .cache-comparison {
+    grid-template-columns: 1fr;
+  }
+
+  /* Forecast: compact model name column */
+  .forecast-model-bar__name {
+    width: 80px;
+    font-size: 0.68rem;
+  }
+
+  .forecast-model-bar__cost {
+    width: 55px;
+    font-size: 0.68rem;
+  }
+
+  /* Dashboard: single column grid (reinforce at 480) */
+  .dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard__card-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- 3. Touch Scrolling Support --- */
+.twf-chart-wrapper {
+  -webkit-overflow-scrolling: touch;
+}
+
+.atl-chart-wrapper {
+  -webkit-overflow-scrolling: touch;
+}
+
+.replay-log {
+  -webkit-overflow-scrolling: touch;
+}
+
+.pricing-table-wrap {
+  -webkit-overflow-scrolling: touch;
+}
+
+.memory-sim-log {
+  -webkit-overflow-scrolling: touch;
+}
+
+.dashboard {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent scroll chaining on all scrollable containers */
+.twf-chart-wrapper,
+.atl-chart-wrapper,
+.replay-log,
+.pricing-table-wrap,
+.memory-sim-log,
+.dashboard,
+.estimator-body,
+.templates-body,
+.api-parser-body,
+.replay-body,
+.planner-body {
+  overscroll-behavior: contain;
+}
+
+/* --- 4. Collapsible Panel Hints & Touch Toggle Areas --- */
+/* Bottom divider hint when panel is closed */
+.estimator-card:not(.estimator-card--open),
+.templates-card:not(.templates-card--open),
+.analytics-card:not(.analytics-card--open),
+.pricing-card:not(.pricing-card--open),
+.api-parser-card:not(.api-parser-card--open),
+.replay-card:not(.replay-card--open),
+.planner-card:not(.planner-card--open),
+.charts-card:not(.charts-card--open),
+.memory-card:not(.memory-card--open),
+.stream-card:not(.stream-card--open),
+.sankey-card:not(.sankey-card--open),
+.cache-card:not(.cache-card--open),
+.forecast-card:not(.forecast-card--open),
+.realtime-monitor-section:not(.realtime-monitor-section--open),
+.alert-timeline-section:not(.alert-timeline-section--open),
+.token-waterfall-section:not(.token-waterfall-section--open) {
+  border-bottom: 2px solid rgba(139, 92, 246, 0.15);
+}
+
+/* Larger touch area for toggle on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .estimator-toggle {
+    min-height: 52px;
+    padding: 16px 20px;
+  }
+}
+
+/* --- 5. Landscape Special Handling --- */
+@media (max-height: 500px) and (orientation: landscape) {
+  /* Compact Health HUD */
+  .health-hud {
+    padding: 0.3rem 0.8rem;
+    gap: 0.6rem;
+    min-height: 36px;
+  }
+
+  .health-hud__ring {
+    width: 28px;
+    height: 28px;
+  }
+
+  .health-hud__metric-label {
+    font-size: 0.55rem;
+  }
+
+  .health-hud__metric-value {
+    font-size: 0.75rem;
+  }
+
+  /* Constrain gauge size in landscape */
+  .gauge-container {
+    max-width: 200px;
+  }
+
+  /* Reduce card padding */
+  .gauge-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  /* Compact app layout */
+  .app {
+    padding: 8px 12px;
+    gap: 12px;
+  }
+
+  /* Reduce stats bar height */
+  .stats-bar {
+    padding: 8px 16px;
+  }
+
+  /* Compact timeline */
+  .timeline-chart {
+    height: 40px;
+  }
+
+  /* Compact RTM canvas */
+  .rtm-canvas {
+    width: 140px;
+    height: 140px;
+  }
+
+  /* Hide less important elements */
+  .footer__hint {
+    display: none;
+  }
+
+  .heatmap {
+    display: none;
+  }
+
+  /* Reduce collapsible bodies max-height to prevent overflow */
+  .estimator-card--open .estimator-body,
+  .analytics-card--open .analytics-body {
+    max-height: 300px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}

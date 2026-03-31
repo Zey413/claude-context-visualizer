@@ -12,17 +12,17 @@ const MemoryTracker = (function () {
 
   // Claude Code fixed overhead (approximate token counts)
   const MEMORY_SEGMENTS = [
-    { id: 'system-prompt', label: 'System Prompt', tokens: 4200, color: '#8B5CF6', icon: '\u2699\uFE0F',
+    { id: 'system-prompt', label: 'System Prompt', tokens: 4200, color: '#8B5CF6', icon: '⚙️',
       desc: 'Core instructions for behavior, tool use, and safety' },
-    { id: 'memory-md', label: 'MEMORY.md', tokens: 680, color: '#A855F7', icon: '\uD83E\uDDE0',
+    { id: 'memory-md', label: 'MEMORY.md', tokens: 680, color: '#A855F7', icon: '🧠',
       desc: 'Auto-memory from previous sessions (first 200 lines or 25KB)' },
-    { id: 'env-info', label: 'Environment Info', tokens: 280, color: '#6366F1', icon: '\uD83D\uDDA5\uFE0F',
+    { id: 'env-info', label: 'Environment Info', tokens: 280, color: '#6366F1', icon: '🖥️',
       desc: 'Working directory, platform, shell, OS, git branch/status' },
-    { id: 'mcp-tools', label: 'MCP Tools (deferred)', tokens: 120, color: '#3B82F6', icon: '\uD83D\uDD27',
+    { id: 'mcp-tools', label: 'MCP Tools (deferred)', tokens: 120, color: '#3B82F6', icon: '🔧',
       desc: 'Tool availability metadata; schemas loaded on-demand' },
-    { id: 'user-files', label: 'User Files', tokens: 0, color: '#10B981', icon: '\uD83D\uDCC1',
+    { id: 'user-files', label: 'User Files', tokens: 0, color: '#10B981', icon: '📁',
       desc: 'Code files read during the session (variable)' },
-    { id: 'conversation', label: 'Conversation', tokens: 0, color: '#F59E0B', icon: '\uD83D\uDCAC',
+    { id: 'conversation', label: 'Conversation', tokens: 0, color: '#F59E0B', icon: '💬',
       desc: 'User messages + assistant responses accumulated over turns' },
   ];
 
@@ -142,7 +142,7 @@ const MemoryTracker = (function () {
 
     // Fixed overhead visual
     var overheadHTML = '<div class="memory-overhead">';
-    overheadHTML += '<div class="memory-overhead__title">\uD83D\uDCE6 Fixed Startup Overhead: <strong>' + formatNumber(FIXED_OVERHEAD) + ' tokens</strong></div>';
+    overheadHTML += '<div class="memory-overhead__title">📦 Fixed Startup Overhead: <strong>' + formatNumber(FIXED_OVERHEAD) + ' tokens</strong></div>';
     overheadHTML += '<div class="memory-overhead__bar">';
 
     var fixedSegs = MEMORY_SEGMENTS.slice(0, 4); // system, memory, env, mcp
@@ -199,7 +199,7 @@ const MemoryTracker = (function () {
         return { id: seg.id, label: seg.label, tokens: seg.tokens, color: seg.color, icon: seg.icon };
       });
       _simState.stepIndex = 0;
-      _addSimLog('system', '\u2699\uFE0F Session started — ' + formatNumber(FIXED_OVERHEAD) + ' tokens loaded');
+      _addSimLog('system', '⚙️ Session started — ' + formatNumber(FIXED_OVERHEAD) + ' tokens loaded');
       _renderSimBar();
     }
 
@@ -239,7 +239,7 @@ const MemoryTracker = (function () {
 
     var scenario = SIM_SCENARIOS[_simState.scenarioIndex];
     if (_simState.stepIndex >= scenario.steps.length) {
-      _addSimLog('system', '\u2705 Session complete!');
+      _addSimLog('system', '✅ Session complete!');
       _simPause();
       return;
     }
@@ -272,10 +272,10 @@ const MemoryTracker = (function () {
     }
 
     var typeIcon = {
-      'file-read': '\uD83D\uDCC1',
-      'user': '\uD83D\uDC64',
-      'assistant': '\uD83E\uDD16',
-      'mcp-expand': '\uD83D\uDD27',
+      'file-read': '📁',
+      'user': '👤',
+      'assistant': '🤖',
+      'mcp-expand': '🔧',
     };
 
     _addSimLog(step.type, (typeIcon[step.type] || '') + ' ' + step.label + ' (+' + formatNumber(step.tokens) + ')');

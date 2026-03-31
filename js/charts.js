@@ -13,7 +13,7 @@ const Charts = (function () {
 
   const CAT_COLORS = { system: '#8B5CF6', user: '#3B82F6', assistant: '#10B981', tools: '#F59E0B' };
   const CAT_LABELS = { system: 'System', user: 'User', assistant: 'Assistant', tools: 'Tools' };
-  const CAT_ICONS = { system: '\u2699\uFE0F', user: '\uD83D\uDC64', assistant: '\uD83E\uDD16', tools: '\uD83D\uDD27' };
+  const CAT_ICONS = { system: '⚙️', user: '👤', assistant: '🤖', tools: '🔧' };
   const CATEGORIES = ['system', 'user', 'assistant', 'tools'];
 
   function init() {
