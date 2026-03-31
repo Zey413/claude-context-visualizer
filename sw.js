@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ctx-viz-v4';
+const CACHE_NAME = 'ctx-viz-v5';
 const ASSETS = [
   './',
   './index.html',
