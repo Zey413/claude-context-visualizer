@@ -5681,6 +5681,20 @@ button:focus-visible, select:focus-visible, input:focus-visible {
 .config-exporter-section--open .estimator-toggle__chevron { transform: rotate(180deg); }
 
 /* =========================================
+   Conversation Analyzer Section
+   ========================================= */
+.conversation-analyzer-section { contain: layout; }
+.conversation-analyzer-section--open .conversation-analyzer-body { display: block !important; }
+.conversation-analyzer-section--open .estimator-toggle__chevron { transform: rotate(180deg); }
+
+/* =========================================
+   Template Builder Section
+   ========================================= */
+.template-builder-section { contain: layout; }
+.template-builder-section--open .template-builder-body { display: block !important; }
+.template-builder-section--open .estimator-toggle__chevron { transform: rotate(180deg); }
+
+/* =========================================
    Mobile & Touch Optimizations
    ========================================= */
 

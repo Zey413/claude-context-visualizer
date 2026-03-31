@@ -2942,7 +2942,10 @@
     compareModelSelect.value = state.compareModelIndex;
     updateSliderMax();
 
-    if (!loaded) {
+    // Check if loaded state is all-zero (stale/empty cache) — apply preset anyway
+    var totalLoaded = categories.reduce(function (s, c) { return s + state.tokens[c]; }, 0);
+
+    if (!loaded || totalLoaded === 0) {
       // Apply default preset — use "Long Conversation" (index 1) for a more visual demo
       applyPreset(1);
     } else {
@@ -2998,6 +3001,18 @@
     initNewModuleToggle('config-exporter');
     if (typeof ConfigExporter !== 'undefined') {
       ConfigExporter.init('config-exporter-container');
+    }
+
+    // ---- v3.3: Initialize Conversation Analyzer ----
+    initNewModuleToggle('conversation-analyzer');
+    if (typeof ConversationAnalyzer !== 'undefined') {
+      ConversationAnalyzer.init('conversation-analyzer-container');
+    }
+
+    // ---- v3.3: Initialize Template Builder ----
+    initNewModuleToggle('template-builder');
+    if (typeof TemplateBuilder !== 'undefined') {
+      TemplateBuilder.init('template-builder-container');
     }
   }
 

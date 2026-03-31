@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] - 2026-03-31
+
+### Added
+- **Conversation Log Analyzer** (`conversation-analyzer.js`) — Batch analysis of Claude API responses
+  - Paste JSON or drag-drop .json files
+  - Supports Claude API response format and simplified turn format
+  - Statistics: total tokens, per-category breakdown, min/max/median, trend chart
+  - Integration: load data into Token Waterfall or Alert Timeline
+  - Generate Markdown analysis reports
+
+- **Custom Template Builder** (`template-builder.js`) — Create and save reusable configurations
+  - Visual template editor with 12 emoji icons
+  - Percentage or absolute token allocation mode
+  - Real-time SVG preview ring
+  - Save up to 10 templates in localStorage
+  - Apply/Edit/Delete/Share functionality
+
+### Fixed
+- **First-load empty dashboard** — Now detects zero-state from stale localStorage and applies "Long Conversation" preset automatically
+- Service worker bumped to v14
+
 ## [3.2.0] - 2026-03-31
 
 ### Added

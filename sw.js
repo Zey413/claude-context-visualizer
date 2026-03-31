@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ctx-viz-v13';
+const CACHE_NAME = 'ctx-viz-v14';
 const ASSETS = [
   './',
   './index.html',
@@ -26,6 +26,8 @@ const ASSETS = [
   './js/optimization-advisor.js',
   './js/config-exporter.js',
   './js/guided-tour.js',
+  './js/conversation-analyzer.js',
+  './js/template-builder.js',
   './js/app.js',
   './assets/favicon.svg',
   './manifest.json',
