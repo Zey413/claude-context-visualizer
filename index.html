@@ -96,6 +96,11 @@
 
     <!-- Main content -->
     <main class="main">
+      <!-- Health Monitor HUD -->
+      <div class="health-hud" id="health-hud" role="status" aria-label="Context health monitor" aria-live="polite">
+        <!-- Built by JS -->
+      </div>
+
       <!-- Left: Gauge(s) -->
       <section class="gauge-section" id="gauge-section" aria-label="Token usage gauge">
         <div class="gauge-card glass-card" id="gauge-card-primary">
@@ -334,6 +339,60 @@
               <canvas id="stream-canvas" class="stream-canvas" aria-hidden="true"></canvas>
             </div>
             <p class="stream-hint">Particles flow toward the context window. Color = category, density = usage volume.</p>
+          </div>
+        </div>
+
+        <!-- Sankey Flow Diagram -->
+        <div class="sankey-card glass-card" id="sankey-card">
+          <button class="estimator-toggle" id="sankey-toggle" aria-expanded="false" aria-controls="sankey-body">
+            <div class="estimator-toggle__left">
+              <span class="estimator-toggle__icon" aria-hidden="true">\uD83C\uDF0A</span>
+              <h3 class="estimator-toggle__title">Token Flow Diagram</h3>
+            </div>
+            <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="sankey-body" id="sankey-body">
+            <div class="sankey-container" id="sankey-container">
+              <div class="charts-empty">Adjust sliders to see token flow</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prompt Cache Savings -->
+        <div class="cache-card glass-card" id="cache-card">
+          <button class="estimator-toggle" id="cache-toggle" aria-expanded="false" aria-controls="cache-body">
+            <div class="estimator-toggle__left">
+              <span class="estimator-toggle__icon" aria-hidden="true">\uD83D\uDCBE</span>
+              <h3 class="estimator-toggle__title">Prompt Cache Savings</h3>
+            </div>
+            <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="cache-body" id="cache-body">
+            <div class="cache-container" id="cache-container">
+              <!-- Built by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Cost Forecast -->
+        <div class="forecast-card glass-card" id="forecast-card">
+          <button class="estimator-toggle" id="forecast-toggle" aria-expanded="false" aria-controls="forecast-body">
+            <div class="estimator-toggle__left">
+              <span class="estimator-toggle__icon" aria-hidden="true">\uD83D\uDCC5</span>
+              <h3 class="estimator-toggle__title">Cost Forecast & Budget</h3>
+            </div>
+            <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="forecast-body" id="forecast-body">
+            <div class="forecast-container" id="forecast-container">
+              <!-- Built by JS -->
+            </div>
           </div>
         </div>
 
@@ -944,6 +1003,10 @@
   <script src="js/charts.js"></script>
   <script src="js/memory-tracker.js"></script>
   <script src="js/stream.js"></script>
+  <script src="js/health-monitor.js"></script>
+  <script src="js/sankey.js"></script>
+  <script src="js/cache-viz.js"></script>
+  <script src="js/cost-forecast.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

@@ -4442,3 +4442,380 @@ body {
   margin-top: 0.4rem;
   text-align: center;
 }
+
+/* =========================================
+   Health Monitor HUD
+   ========================================= */
+.health-hud {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  min-height: 48px;
+}
+
+.health-hud__ring {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.health-hud__metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05rem;
+}
+
+.health-hud__metric-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+}
+
+.health-hud__metric-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.health-hud__model-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.3rem;
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--accent-purple);
+  white-space: nowrap;
+}
+
+.health-hud__alert {
+  display: none;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-red);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.health-hud__alert--visible {
+  display: flex;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.health-hud__spacer {
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .health-hud {
+    gap: 0.6rem;
+    padding: 0.5rem 0.8rem;
+  }
+  .health-hud__metric-value {
+    font-size: 0.75rem;
+  }
+}
+
+/* =========================================
+   Sankey Flow Diagram
+   ========================================= */
+.sankey-card { contain: layout; }
+.sankey-card--open .sankey-body { display: block; }
+.sankey-body { display: none; padding: 1rem 0 0; }
+
+.sankey-container {
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sankey-svg {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+}
+
+/* =========================================
+   Prompt Cache Savings
+   ========================================= */
+.cache-card { contain: layout; }
+.cache-card--open .cache-body { display: block; }
+.cache-body { display: none; padding: 1rem 0 0; }
+
+.cache-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cache-sliders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.cache-slider-group label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+}
+
+.cache-slider-group input[type="range"] {
+  width: 100%;
+}
+
+.cache-slider-group .cache-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+}
+
+.cache-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.cache-bar-card {
+  padding: 0.8rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.cache-bar-card__label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+}
+
+.cache-bar-card__value {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.cache-bar-card__value--uncached { color: var(--accent-red); }
+.cache-bar-card__value--cached { color: var(--accent-green); }
+
+.cache-savings {
+  text-align: center;
+  padding: 0.6rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--accent-green);
+  font-weight: 600;
+}
+
+.cache-breakdown {
+  font-size: 0.78rem;
+}
+
+.cache-breakdown table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cache-breakdown th,
+.cache-breakdown td {
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.cache-breakdown th {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.cache-breakdown td {
+  color: var(--text-primary);
+}
+
+.cache-recommendation {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 0.8rem;
+  background: var(--glass-bg);
+  border-left: 3px solid var(--accent-purple);
+  border-radius: 0 0.3rem 0.3rem 0;
+}
+
+@media (max-width: 600px) {
+  .cache-sliders,
+  .cache-comparison {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================
+   Cost Forecast & Budget
+   ========================================= */
+.forecast-card { contain: layout; }
+.forecast-card--open .forecast-body { display: block; }
+.forecast-body { display: none; padding: 1rem 0 0; }
+
+.forecast-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.forecast-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.forecast-input-row label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.forecast-input-row input {
+  width: 100px;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.4rem;
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.forecast-projections {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.6rem;
+}
+
+.forecast-proj-card {
+  padding: 0.6rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.forecast-proj-card__label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin-bottom: 0.2rem;
+}
+
+.forecast-proj-card__value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.forecast-model-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.forecast-model-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+}
+
+.forecast-model-bar__name {
+  width: 130px;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.forecast-model-bar__track {
+  flex: 1;
+  height: 14px;
+  background: var(--glass-bg);
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.forecast-model-bar__fill {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.3s ease;
+  min-width: 2px;
+}
+
+.forecast-model-bar__cost {
+  width: 70px;
+  text-align: right;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.75rem;
+}
+
+.forecast-budget {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.forecast-budget__bar {
+  flex: 1;
+  min-width: 100px;
+  height: 10px;
+  background: rgba(100, 100, 100, 0.2);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.forecast-budget__fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.3s, background 0.3s;
+}
+
+.forecast-budget__text {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.forecast-recommendation {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 0.8rem;
+  background: var(--glass-bg);
+  border-left: 3px solid var(--accent-green);
+  border-radius: 0 0.3rem 0.3rem 0;
+}

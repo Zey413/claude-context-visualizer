@@ -1192,6 +1192,26 @@
       var streamModel = CLAUDE_MODELS[state.modelIndex];
       TokenStream.setTokens(state.tokens, streamModel.contextWindow);
     }
+
+    // Update health monitor HUD
+    if (typeof HealthMonitor !== 'undefined') {
+      HealthMonitor.update(state.tokens, CLAUDE_MODELS[state.modelIndex]);
+    }
+
+    // Update Sankey diagram if open
+    if (typeof SankeyDiagram !== 'undefined' && SankeyDiagram.isInited()) {
+      SankeyDiagram.update(state.tokens, CLAUDE_MODELS[state.modelIndex].contextWindow);
+    }
+
+    // Update cache visualizer if open
+    if (typeof CacheViz !== 'undefined' && CacheViz.isInited()) {
+      CacheViz.update(state.tokens, CLAUDE_MODELS[state.modelIndex]);
+    }
+
+    // Update cost forecast if open
+    if (typeof CostForecast !== 'undefined' && CostForecast.isInited()) {
+      CostForecast.update(state.tokens, state.modelIndex);
+    }
   }
 
   // ---- Keyboard Shortcuts ----
@@ -2745,6 +2765,34 @@
     log.scrollTop = log.scrollHeight;
   }
 
+  // ---- Health Monitor ----
+  function initHealthMonitor() {
+    if (typeof HealthMonitor !== 'undefined') {
+      HealthMonitor.init();
+    }
+  }
+
+  // ---- Sankey Diagram ----
+  function initSankey() {
+    if (typeof SankeyDiagram !== 'undefined') {
+      SankeyDiagram.init();
+    }
+  }
+
+  // ---- Cache Visualizer ----
+  function initCacheViz() {
+    if (typeof CacheViz !== 'undefined') {
+      CacheViz.init();
+    }
+  }
+
+  // ---- Cost Forecast ----
+  function initCostForecast() {
+    if (typeof CostForecast !== 'undefined') {
+      CostForecast.init();
+    }
+  }
+
   // ---- Token Stream ----
   function initTokenStream() {
     if (typeof TokenStream !== 'undefined') {
@@ -2788,6 +2836,10 @@
     initCharts();
     initMemoryTracker();
     initTokenStream();
+    initHealthMonitor();
+    initSankey();
+    initCacheViz();
+    initCostForecast();
     initEstimator();
     initAnalytics();
     initPricing();
