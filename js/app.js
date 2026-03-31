@@ -101,8 +101,12 @@
       const btn = document.createElement('button');
       btn.classList.add('preset-btn');
       btn.dataset.presetIndex = i;
-      btn.innerHTML = `<span class="preset-btn__icon">${preset.icon}</span>${preset.name}`;
-      btn.title = preset.description;
+      const keys = typeof I18n !== 'undefined' ? I18n.getPresetKeys(i) : null;
+      const name = keys ? I18n.t(keys.name) : preset.name;
+      const desc = keys ? I18n.t(keys.desc) : preset.description;
+      btn.innerHTML = `<span class="preset-btn__icon">${preset.icon}</span>${name}`;
+      btn.title = desc;
+      btn.setAttribute('aria-label', name + ': ' + desc);
       btn.addEventListener('click', () => applyPreset(i));
       presetsGrid.appendChild(btn);
     });

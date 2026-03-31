@@ -60,6 +60,7 @@ class GaugeRenderer {
 
     // Tick marks
     this.tickGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    this.tickGroup.classList.add('gauge-ticks-rotating');
     for (let i = 0; i < 60; i++) {
       const angle = (i / 60) * 360 - 90;
       const rad = (angle * Math.PI) / 180;
