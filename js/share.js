@@ -50,7 +50,10 @@ const ShareModule = {
     canvas.width = width;
     canvas.height = height;
     var ctx = canvas.getContext('2d');
-
+    if (!ctx) {
+      ShareModule.showToast('Canvas not supported');
+      return;
+    }
     // --- Background gradient ---
     var bgGrad = ctx.createLinearGradient(0, 0, width, height);
     bgGrad.addColorStop(0, '#0A0A0F');
@@ -218,21 +221,25 @@ const ShareModule = {
     ctx.fillText('Claude Context Window Visualizer', width - 16, height - 12);
 
     // --- Download as PNG ---
-    canvas.toBlob(function (blob) {
-      if (!blob) {
-        ShareModule.showToast('Failed to generate image');
-        return;
-      }
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'claude-context-' + model.id + '-' + Math.round(percent) + 'pct.png';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      ShareModule.showToast('PNG exported successfully');
-    }, 'image/png');
+    try {
+      canvas.toBlob(function (blob) {
+        if (!blob) {
+          ShareModule.showToast('Failed to generate image');
+          return;
+        }
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'claude-context-' + model.id + '-' + Math.round(percent) + 'pct.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        ShareModule.showToast('PNG exported successfully');
+      }, 'image/png');
+    } catch (e) {
+      ShareModule.showToast('Failed to export image');
+    }
   },
 
   /**
