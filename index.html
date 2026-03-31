@@ -295,6 +295,29 @@
           </div>
         </div>
 
+        <!-- Charts -->
+        <div class="charts-card glass-card" id="charts-card">
+          <button class="estimator-toggle" id="charts-toggle" aria-expanded="false" aria-controls="charts-body">
+            <div class="estimator-toggle__left">
+              <span class="estimator-toggle__icon" aria-hidden="true">\uD83D\uDCC8</span>
+              <h3 class="estimator-toggle__title">Advanced Charts</h3>
+            </div>
+            <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="charts-body" id="charts-body">
+            <div class="charts-tabs" role="tablist" aria-label="Chart type selection">
+              <button class="charts-tab charts-tab--active" data-chart="pie" role="tab" aria-selected="true">Pie</button>
+              <button class="charts-tab" data-chart="radar" role="tab" aria-selected="false">Radar</button>
+              <button class="charts-tab" data-chart="trend" role="tab" aria-selected="false">Trend</button>
+            </div>
+            <div class="charts-container" id="charts-container" role="tabpanel" aria-label="Chart visualization">
+              <div class="charts-empty">Select a chart type and adjust sliders</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Token Estimator -->
         <div class="estimator-card glass-card" id="estimator-card">
           <button class="estimator-toggle" id="estimator-toggle" aria-expanded="false" aria-controls="estimator-body">
@@ -850,6 +873,7 @@
   <script src="js/particles.js"></script>
   <script src="js/share.js"></script>
   <script src="js/dashboard.js"></script>
+  <script src="js/charts.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

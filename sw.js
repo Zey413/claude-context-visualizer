@@ -9,6 +9,7 @@ const ASSETS = [
   './js/particles.js',
   './js/share.js',
   './js/dashboard.js',
+  './js/charts.js',
   './js/app.js',
   './assets/favicon.svg',
   './manifest.json',

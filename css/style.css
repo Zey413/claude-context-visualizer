@@ -3960,3 +3960,193 @@ body {
     gap: 0.5rem;
   }
 }
+
+/* =========================================
+   Charts Module
+   ========================================= */
+.charts-card {
+  contain: layout;
+}
+
+.charts-card--open .charts-body {
+  display: block;
+}
+
+.charts-body {
+  display: none;
+  padding: 1rem 0 0;
+}
+
+.charts-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.charts-tab {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.5rem;
+  background: var(--glass-bg);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.charts-tab:hover {
+  background: var(--glass-hover);
+  color: var(--text-primary);
+}
+
+.charts-tab--active {
+  background: var(--accent-purple);
+  color: #fff;
+  border-color: var(--accent-purple);
+}
+
+.charts-container {
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.charts-empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Pie chart */
+.charts-pie-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.charts-pie-svg {
+  width: 220px;
+  height: 220px;
+  flex-shrink: 0;
+}
+
+.charts-pie-seg {
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.charts-pie-seg:hover {
+  opacity: 1 !important;
+  filter: brightness(1.15);
+}
+
+/* Legend */
+.charts-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.charts-legend--horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 0.8rem;
+}
+
+.charts-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.charts-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.charts-legend-label {
+  color: var(--text-secondary);
+}
+
+.charts-legend-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+/* Radar chart */
+.charts-radar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.charts-radar-svg {
+  width: 280px;
+  height: 280px;
+}
+
+.charts-radar-scores {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.charts-radar-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.charts-radar-score-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.charts-radar-score-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Trend line chart */
+.charts-trend-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.charts-trend-svg {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+}
+
+@media (max-width: 600px) {
+  .charts-pie-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+  .charts-radar-svg {
+    width: 240px;
+    height: 240px;
+  }
+}

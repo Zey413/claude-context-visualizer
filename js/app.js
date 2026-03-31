@@ -1180,6 +1180,12 @@
     if (typeof Dashboard !== 'undefined' && Dashboard.isVisible()) {
       Dashboard.update(state);
     }
+
+    // Update charts if open
+    if (typeof Charts !== 'undefined' && Charts.isInited()) {
+      var model = CLAUDE_MODELS[state.modelIndex];
+      Charts.update(state.tokens, model.contextWindow, state.timeline);
+    }
   }
 
   // ---- Keyboard Shortcuts ----
@@ -2730,6 +2736,13 @@
     log.scrollTop = log.scrollHeight;
   }
 
+  // ---- Charts ----
+  function initCharts() {
+    if (typeof Charts !== 'undefined') {
+      Charts.init();
+    }
+  }
+
   // ---- Dashboard ----
   function initDashboard() {
     var btn = document.getElementById('dashboard-toggle');
@@ -2749,6 +2762,7 @@
     initKeyboard();
     initCompareMode();
     initDashboard();
+    initCharts();
     initEstimator();
     initAnalytics();
     initPricing();
