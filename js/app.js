@@ -643,6 +643,7 @@
 
   // ---- Comparison Mode ----
   function initCompareMode() {
+    if (!compareToggle) return;
     compareToggle.addEventListener('click', () => {
       state.compareMode = !state.compareMode;
       toggleCompareMode();
