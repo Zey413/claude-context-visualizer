@@ -347,6 +347,7 @@
 
   // ---- Init Models ----
   function initModelSelect() {
+    if (!modelSelect || !compareModelSelect) return;
     CLAUDE_MODELS.forEach((m, i) => {
       const opt = document.createElement('option');
       opt.value = i;
@@ -379,6 +380,7 @@
 
   // ---- Init Presets ----
   function initPresets() {
+    if (!presetsGrid) return;
     PRESETS.forEach((preset, i) => {
       const btn = document.createElement('button');
       btn.classList.add('preset-btn');
@@ -845,6 +847,11 @@
   }
 
   function resetState() {
+    // Cancel any running counter animations
+    Object.keys(_activeAnimations).forEach(function (id) {
+      cancelAnimationFrame(_activeAnimations[id]);
+      delete _activeAnimations[id];
+    });
     categories.forEach(cat => { state.tokens[cat] = 0; });
     state.activePreset = null;
     syncSlidersFromState();
