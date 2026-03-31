@@ -51,6 +51,15 @@ body {
 }
 
 /* --- Background Effects --- */
+.particle-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .bg-noise {
   position: fixed;
   inset: 0;
@@ -156,7 +165,48 @@ body {
   margin-top: 2px;
 }
 
-/* --- Model Select --- */
+/* --- Model Select & Header Controls --- */
+.header__controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.compare-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: var(--bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.compare-btn:hover {
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.compare-btn--active {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+}
+
+.compare-btn svg {
+  flex-shrink: 0;
+}
+
 .select-wrapper {
   position: relative;
 }
@@ -205,6 +255,12 @@ body {
 .gauge-section {
   display: flex;
   align-items: flex-start;
+  gap: 16px;
+  transition: all var(--transition-normal);
+}
+
+.gauge-section--compare {
+  /* In compare mode, show two gauges side by side */
 }
 
 .gauge-card {
@@ -214,6 +270,31 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  position: relative;
+}
+
+.gauge-card__model-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  text-align: center;
+  min-height: 1em;
+}
+
+.gauge-card--compare {
+  animation: fadeSlideIn 0.4s ease both;
+}
+
+.compare-model-select-wrapper {
+  margin-top: 4px;
+}
+
+.model-select--compare {
+  min-width: 180px;
+  font-size: 0.8rem;
+  padding: 8px 32px 8px 12px;
 }
 
 .gauge-container {
@@ -579,6 +660,132 @@ body {
   font-family: 'SF Mono', monospace;
 }
 
+/* --- Usage Timeline --- */
+.timeline-section {
+  padding: 20px 24px;
+  animation: fadeSlideIn 0.6s ease 0.48s both;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.timeline-title {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.timeline-subtitle {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 80px;
+  padding: 0 2px;
+}
+
+.timeline-empty {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.timeline-bar {
+  flex: 1;
+  min-width: 0;
+  border-radius: 4px 4px 2px 2px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  cursor: default;
+  transition: all var(--transition-fast);
+  overflow: hidden;
+}
+
+.timeline-bar:hover {
+  filter: brightness(1.2);
+  transform: scaleY(1.03);
+  transform-origin: bottom;
+}
+
+.timeline-bar__segment {
+  width: 100%;
+  transition: height var(--transition-normal);
+  min-height: 0;
+}
+
+.timeline-bar__segment--system {
+  background: var(--accent-purple);
+}
+
+.timeline-bar__segment--user {
+  background: var(--accent-blue);
+}
+
+.timeline-bar__segment--assistant {
+  background: var(--accent-green);
+}
+
+.timeline-bar__segment--tools {
+  background: var(--accent-amber);
+}
+
+.timeline-bar__segment--remaining {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.timeline-bar__tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(13, 11, 20, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 0.65rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  z-index: 10;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.timeline-bar:hover .timeline-bar__tooltip {
+  opacity: 1;
+}
+
+.timeline-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 /* --- Animations --- */
 @keyframes fadeSlideIn {
   from {
@@ -686,6 +893,10 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .gauge-section {
+    flex-direction: column;
+  }
+
   .gauge-card {
     padding: 24px;
   }
@@ -701,6 +912,14 @@ body {
   .stats-bar {
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+  .header__controls {
+    flex-wrap: wrap;
+  }
+
+  .timeline-chart {
+    height: 60px;
   }
 }
 
@@ -719,8 +938,17 @@ body {
     font-size: 1.2rem;
   }
 
+  .header__controls {
+    width: 100%;
+  }
+
   .model-select {
     min-width: 100%;
+  }
+
+  .compare-btn {
+    flex: 1;
+    justify-content: center;
   }
 
   .breakdown-grid {
@@ -734,6 +962,11 @@ body {
   .slider-row {
     grid-template-columns: 60px 1fr 70px;
     gap: 8px;
+  }
+
+  .timeline-chart {
+    height: 50px;
+    gap: 4px;
   }
 }
 
