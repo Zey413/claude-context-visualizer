@@ -542,6 +542,58 @@ body {
   font-size: 1rem;
 }
 
+/* --- Usage Breakdown Bar --- */
+.usage-breakdown {
+  width: 100%;
+  padding: 0 4px;
+}
+
+.usage-breakdown__bar {
+  display: flex;
+  width: 100%;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--remaining-bar-bg);
+}
+
+.usage-breakdown__segment {
+  height: 100%;
+  background: var(--seg-color);
+  transition: width var(--transition-slow);
+  min-width: 0;
+}
+
+.usage-breakdown__segment--remaining {
+  flex: 1;
+  background: transparent;
+}
+
+.usage-breakdown__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  gap: 4px;
+}
+
+.usage-breakdown__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: color var(--transition-fast);
+}
+
+.usage-breakdown__cost-line {
+  margin-top: 6px;
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  letter-spacing: 0.01em;
+}
+
 /* --- Controls Section --- */
 .controls-section {
   display: flex;

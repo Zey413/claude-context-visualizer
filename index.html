@@ -4,7 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Claude Context Window Visualizer</title>
+  <meta name="description" content="Interactive visualization of Claude's context window token usage. Animated SVG gauge, model comparison, cost estimates, i18n, and dark glassmorphism UI.">
+  <meta name="author" content="Zey413">
+  <meta name="keywords" content="Claude, context window, token, visualizer, Anthropic, AI, LLM, API">
+  <!-- Open Graph -->
+  <meta property="og:title" content="Claude Context Window Visualizer">
+  <meta property="og:description" content="Interactive visualization of Claude's context window token usage with animated gauge, analytics, and model comparison.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://zey413.github.io/claude-context-visualizer/">
+  <meta property="og:image" content="https://zey413.github.io/claude-context-visualizer/assets/favicon.svg">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Claude Context Window Visualizer">
+  <meta name="twitter:description" content="Interactive token usage visualization for Claude AI models.">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/favicon.svg">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#8B5CF6">
   <link rel="stylesheet" href="css/style.css">
@@ -108,6 +122,23 @@
               </svg>
               <span>Copy Stats</span>
             </button>
+          </div>
+          <!-- Usage Breakdown Bar -->
+          <div class="usage-breakdown" id="usage-breakdown">
+            <div class="usage-breakdown__bar" id="breakdown-bar">
+              <div class="usage-breakdown__segment" id="breakdown-seg-system" style="--seg-color: #8B5CF6"></div>
+              <div class="usage-breakdown__segment" id="breakdown-seg-user" style="--seg-color: #3B82F6"></div>
+              <div class="usage-breakdown__segment" id="breakdown-seg-assistant" style="--seg-color: #10B981"></div>
+              <div class="usage-breakdown__segment" id="breakdown-seg-tools" style="--seg-color: #F59E0B"></div>
+              <div class="usage-breakdown__segment usage-breakdown__segment--remaining" id="breakdown-seg-remaining"></div>
+            </div>
+            <div class="usage-breakdown__labels" id="breakdown-labels">
+              <span class="usage-breakdown__label" style="color: #8B5CF6" id="breakdown-lbl-system">⚙️ 0%</span>
+              <span class="usage-breakdown__label" style="color: #3B82F6" id="breakdown-lbl-user">👤 0%</span>
+              <span class="usage-breakdown__label" style="color: #10B981" id="breakdown-lbl-assistant">🤖 0%</span>
+              <span class="usage-breakdown__label" style="color: #F59E0B" id="breakdown-lbl-tools">🔧 0%</span>
+            </div>
+            <div class="usage-breakdown__cost-line" id="breakdown-cost-line">~0 tokens per $0.001</div>
           </div>
         </div>
         <!-- Secondary gauge for comparison mode (hidden by default) -->

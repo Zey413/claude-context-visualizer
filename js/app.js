@@ -84,6 +84,16 @@
   const statContextWindow = document.getElementById('stat-context-window');
   const statOutputLimit = document.getElementById('stat-output-limit');
 
+  // Usage breakdown elements
+  const breakdownSegments = {};
+  const breakdownLabels = {};
+  categories.forEach(cat => {
+    breakdownSegments[cat] = document.getElementById(`breakdown-seg-${cat}`);
+    breakdownLabels[cat] = document.getElementById(`breakdown-lbl-${cat}`);
+  });
+  const breakdownSegRemaining = document.getElementById('breakdown-seg-remaining');
+  const breakdownCostLine = document.getElementById('breakdown-cost-line');
+
   // ---- Gauge ----
   const gauge = new GaugeRenderer('gauge-container');
   let gaugeCompare = null; // Created lazily when compare mode is activated
@@ -111,6 +121,9 @@
       if (dotEls[cat]) dotEls[cat].style.background = color;
       sliders[cat].style.setProperty('--slider-color', color);
       barEls[cat].style.setProperty('--cat-color', color);
+      // Sync breakdown bar segment & label colors
+      if (breakdownSegments[cat]) breakdownSegments[cat].style.setProperty('--seg-color', color);
+      if (breakdownLabels[cat]) breakdownLabels[cat].style.color = color;
     });
     gauge.setSegmentColors(categories.map(getCatColor));
     if (gaugeCompare) {
@@ -611,6 +624,9 @@
       }
     });
 
+    // Update usage breakdown bar & labels
+    updateUsageBreakdown(model, total);
+
     // Update sparklines
     renderSparklines();
 
@@ -730,6 +746,38 @@
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  // ---- Usage Breakdown Bar ----
+  const BREAKDOWN_ICONS = { system: '⚙️', user: '👤', assistant: '🤖', tools: '🔧' };
+
+  function updateUsageBreakdown(model, total) {
+    categories.forEach(cat => {
+      const pct = model.contextWindow > 0 ? (state.tokens[cat] / model.contextWindow) * 100 : 0;
+      if (breakdownSegments[cat]) {
+        breakdownSegments[cat].style.width = pct > 0 ? pct + '%' : '0%';
+        // Sync color with custom color
+        const color = getCatColor(cat);
+        breakdownSegments[cat].style.setProperty('--seg-color', color);
+      }
+      if (breakdownLabels[cat]) {
+        breakdownLabels[cat].textContent = BREAKDOWN_ICONS[cat] + ' ' + Math.round(pct) + '%';
+        breakdownLabels[cat].style.color = getCatColor(cat);
+      }
+    });
+
+    // Token-per-dollar indicator
+    if (breakdownCostLine) {
+      // Blended cost: average of input & output price per MTok, weighted by usage
+      const inputTokens = ['system', 'user', 'tools'].reduce((s, c) => s + state.tokens[c], 0);
+      const outputTokens = state.tokens.assistant;
+      const costPerMil = total > 0
+        ? ((inputTokens / total) * model.pricing.inputPerMTok + (outputTokens / total) * model.pricing.outputPerMTok)
+        : model.pricing.inputPerMTok;
+      // tokens per $0.001 = (0.001 / (costPerMil / 1_000_000)) = 1000 / costPerMil
+      const tokensPerMilli = costPerMil > 0 ? Math.round(1000 / costPerMil) : 0;
+      breakdownCostLine.textContent = '~' + formatNumber(tokensPerMilli) + ' tokens per $0.001';
     }
   }
 

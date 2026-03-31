@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://zey413.github.io/claude-context-visualizer/sitemap.xml
