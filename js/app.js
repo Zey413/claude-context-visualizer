@@ -308,6 +308,192 @@
   const particles = new ParticleSystem();
   particles.start();
 
+  // ---- Context Window Heatmap ----
+  const _heatmap = {
+    grid: null,
+    tooltip: null,
+    cells: [],           // Array of cell DOM elements
+    cellCount: 0,        // Current number of cells in the grid
+    cellCategories: [],  // Category string per cell ('system','user','assistant','tools','remaining')
+  };
+
+  /**
+   * Determine the grid size based on the model's context window.
+   * 1M models get 10x10=100 cells, 200K models get 8x8=64.
+   */
+  function getHeatmapCellCount(contextWindow) {
+    return contextWindow >= 500000 ? 100 : 64;
+  }
+
+  /**
+   * Initialize the heatmap: create the grid container reference and tooltip.
+   */
+  function initHeatmap() {
+    _heatmap.grid = document.getElementById('heatmap-grid');
+    if (!_heatmap.grid) return;
+
+    // Create shared tooltip element
+    _heatmap.tooltip = document.createElement('div');
+    _heatmap.tooltip.className = 'heatmap__tooltip';
+    _heatmap.tooltip.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(_heatmap.tooltip);
+
+    // Build initial cells for the default model
+    const model = CLAUDE_MODELS[state.modelIndex];
+    buildHeatmapCells(getHeatmapCellCount(model.contextWindow));
+  }
+
+  /**
+   * Build (or rebuild) heatmap cells when the total cell count changes.
+   */
+  function buildHeatmapCells(count) {
+    if (!_heatmap.grid) return;
+    _heatmap.cellCount = count;
+    _heatmap.cells = [];
+    _heatmap.cellCategories = [];
+    _heatmap.grid.innerHTML = '';
+
+    for (var i = 0; i < count; i++) {
+      var cell = document.createElement('div');
+      cell.className = 'heatmap__cell heatmap__cell--remaining';
+      cell.dataset.index = i;
+      _heatmap.grid.appendChild(cell);
+      _heatmap.cells.push(cell);
+      _heatmap.cellCategories.push('remaining');
+    }
+
+    // Attach a single delegated mousemove + mouseleave on the grid for performance
+    _heatmap.grid.addEventListener('mousemove', heatmapMouseMove);
+    _heatmap.grid.addEventListener('mouseleave', heatmapMouseLeave);
+  }
+
+  /**
+   * Show tooltip near the hovered cell.
+   */
+  function heatmapMouseMove(e) {
+    var cell = e.target.closest('.heatmap__cell');
+    if (!cell) {
+      _heatmap.tooltip.classList.remove('heatmap__tooltip--visible');
+      return;
+    }
+
+    var idx = parseInt(cell.dataset.index, 10);
+    if (isNaN(idx)) return;
+
+    var model = CLAUDE_MODELS[state.modelIndex];
+    var tokensPerCell = model.contextWindow / _heatmap.cellCount;
+    var rangeStart = Math.floor(idx * tokensPerCell) + 1;
+    var rangeEnd = Math.floor((idx + 1) * tokensPerCell);
+    var category = _heatmap.cellCategories[idx] || 'remaining';
+    var catLabel = category.charAt(0).toUpperCase() + category.slice(1);
+
+    _heatmap.tooltip.textContent = 'Tokens ' + formatNumber(rangeStart) + ' - ' + formatNumber(rangeEnd) + ' (' + catLabel + ')';
+    _heatmap.tooltip.classList.add('heatmap__tooltip--visible');
+
+    // Position near cursor
+    var tx = e.clientX + 12;
+    var ty = e.clientY - 32;
+
+    // Keep tooltip in viewport
+    var tw = _heatmap.tooltip.offsetWidth;
+    if (tx + tw > window.innerWidth - 8) {
+      tx = e.clientX - tw - 8;
+    }
+    if (ty < 4) {
+      ty = e.clientY + 16;
+    }
+
+    _heatmap.tooltip.style.left = tx + 'px';
+    _heatmap.tooltip.style.top = ty + 'px';
+  }
+
+  function heatmapMouseLeave() {
+    _heatmap.tooltip.classList.remove('heatmap__tooltip--visible');
+  }
+
+  /**
+   * Update the heatmap cells based on current token state.
+   * Only updates cells whose category has changed (efficient diffing).
+   */
+  function updateHeatmap() {
+    if (!_heatmap.grid || _heatmap.cellCount === 0) return;
+
+    var model = CLAUDE_MODELS[state.modelIndex];
+    var desiredCount = getHeatmapCellCount(model.contextWindow);
+
+    // Rebuild grid if cell count changed (model switch)
+    if (desiredCount !== _heatmap.cellCount) {
+      buildHeatmapCells(desiredCount);
+    }
+
+    var totalCells = _heatmap.cellCount;
+    var tokensPerCell = model.contextWindow / totalCells;
+
+    // Calculate how many cells each category occupies (in order: system, user, assistant, tools, remaining)
+    var catOrder = ['system', 'user', 'assistant', 'tools'];
+    var catCells = {};
+    var usedCells = 0;
+
+    catOrder.forEach(function (cat) {
+      var cells = Math.round(state.tokens[cat] / tokensPerCell);
+      // Don't let rounding exceed remaining cells
+      cells = Math.min(cells, totalCells - usedCells);
+      catCells[cat] = cells;
+      usedCells += cells;
+    });
+
+    // Get active colors (custom or default)
+    var catColors = {};
+    catOrder.forEach(function (cat) {
+      catColors[cat] = getCatColor(cat);
+    });
+
+    // Fill cells left-to-right, top-to-bottom
+    var cellIdx = 0;
+    for (var c = 0; c < catOrder.length; c++) {
+      var cat = catOrder[c];
+      var count = catCells[cat];
+      for (var j = 0; j < count; j++) {
+        if (cellIdx >= totalCells) break;
+        if (_heatmap.cellCategories[cellIdx] !== cat) {
+          _heatmap.cellCategories[cellIdx] = cat;
+          var cell = _heatmap.cells[cellIdx];
+          cell.className = 'heatmap__cell heatmap__cell--' + cat;
+          cell.style.backgroundColor = catColors[cat];
+        }
+        cellIdx++;
+      }
+    }
+
+    // Fill remaining cells
+    for (; cellIdx < totalCells; cellIdx++) {
+      if (_heatmap.cellCategories[cellIdx] !== 'remaining') {
+        _heatmap.cellCategories[cellIdx] = 'remaining';
+        var remCell = _heatmap.cells[cellIdx];
+        remCell.className = 'heatmap__cell heatmap__cell--remaining';
+        remCell.style.backgroundColor = '';
+      }
+    }
+
+    // Update legend dot colors to match custom colors
+    updateHeatmapLegendColors(catColors);
+  }
+
+  /**
+   * Keep the legend dots in sync with any custom category colors.
+   */
+  function updateHeatmapLegendColors(catColors) {
+    var legendEl = document.getElementById('heatmap-legend');
+    if (!legendEl) return;
+    var dots = legendEl.querySelectorAll('.heatmap__legend-dot:not(.heatmap__legend-dot--remaining)');
+    var catOrder = ['system', 'user', 'assistant', 'tools'];
+    dots.forEach(function (dot, i) {
+      if (catOrder[i] && catColors[catOrder[i]]) {
+        dot.style.backgroundColor = catColors[catOrder[i]];
+      }
+    });
+  }
+
 
   // ---- Category Color Helpers ----
 
@@ -334,6 +520,12 @@
     gauge.setSegmentColors(categories.map(getCatColor));
     if (gaugeCompare) {
       gaugeCompare.setSegmentColors(categories.map(getCatColor));
+    }
+    // Re-render heatmap to pick up new colors
+    if (_heatmap.grid && _heatmap.cellCount > 0) {
+      // Force all cells to re-render by clearing cached categories
+      _heatmap.cellCategories = _heatmap.cellCategories.map(function () { return ''; });
+      updateHeatmap();
     }
   }
 
@@ -838,6 +1030,9 @@
 
     // Update usage breakdown bar & labels
     updateUsageBreakdown(model, total);
+
+    // Update context window heatmap
+    updateHeatmap();
 
     // Update sparklines
     renderSparklines();
@@ -2050,6 +2245,7 @@
     initPricing();
     initApiParser();
     initReplay();
+    initHeatmap();
     initTheme();
     initColorCycling();
     initLangSelector();
