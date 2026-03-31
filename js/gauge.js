@@ -32,6 +32,8 @@ class GaugeRenderer {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', `0 0 ${this.size} ${this.size}`);
     svg.classList.add('gauge-svg');
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Token usage gauge chart');
 
     // Defs for filters
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -113,6 +115,8 @@ class GaugeRenderer {
     this.percentText.setAttribute('y', this.cy - 8);
     this.percentText.classList.add('gauge-center-percent');
     this.percentText.setAttribute('font-size', '48');
+    this.percentText.setAttribute('aria-live', 'polite');
+    this.percentText.setAttribute('role', 'status');
     this.percentText.textContent = '0%';
     centerG.appendChild(this.percentText);
 
@@ -120,7 +124,7 @@ class GaugeRenderer {
     this.labelText.setAttribute('x', this.cx);
     this.labelText.setAttribute('y', this.cy + 16);
     this.labelText.classList.add('gauge-center-label');
-    this.labelText.textContent = 'Context Used';
+    this.labelText.textContent = typeof I18n !== 'undefined' ? I18n.t('contextUsed') : 'Context Used';
     centerG.appendChild(this.labelText);
 
     this.tokensText = document.createElementNS('http://www.w3.org/2000/svg', 'text');

@@ -1,0 +1,17 @@
+{
+  "name": "Claude Context Visualizer",
+  "short_name": "CtxViz",
+  "description": "Interactive visualization of Claude's context window token usage",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0A0A0F",
+  "theme_color": "#8B5CF6",
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

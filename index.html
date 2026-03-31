@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Claude Context Window Visualizer</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#8B5CF6">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -234,6 +236,41 @@
             <!-- Populated by JS -->
           </div>
         </div>
+
+        <!-- Token Estimator -->
+        <div class="estimator-card glass-card" id="estimator-card">
+          <button class="estimator-toggle" id="estimator-toggle" aria-expanded="false" aria-controls="estimator-body">
+            <div class="estimator-toggle__left">
+              <span class="estimator-toggle__icon" aria-hidden="true">📐</span>
+              <h3 class="estimator-toggle__title">Token Estimator</h3>
+            </div>
+            <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="estimator-body" id="estimator-body">
+            <div class="estimator-textarea-wrap">
+              <textarea id="estimator-textarea" class="estimator-textarea" placeholder="Paste text here to estimate token count..." rows="4" aria-label="Text to estimate tokens"></textarea>
+              <div class="estimator-result" id="estimator-result" aria-live="polite">
+                <span class="estimator-result__count" id="estimator-count">0</span> estimated tokens
+              </div>
+            </div>
+            <div class="estimator-add-row" id="estimator-add-row">
+              <label class="estimator-add-label" for="estimator-add-target">Add to:</label>
+              <select id="estimator-add-target" class="estimator-add-select" aria-label="Target category for estimated tokens">
+                <option value="system">System</option>
+                <option value="user" selected>User</option>
+                <option value="assistant">Assistant</option>
+                <option value="tools">Tools</option>
+              </select>
+              <button class="estimator-add-btn" id="estimator-add-btn" title="Add estimated tokens to selected category">+ Add</button>
+            </div>
+            <div class="estimator-chips-label">Quick Estimates</div>
+            <div class="estimator-chips" id="estimator-chips" role="group" aria-label="Quick token estimates">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
       </section>
     </main>
 
@@ -293,5 +330,10 @@
   <script src="js/particles.js"></script>
   <script src="js/share.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
 </body>
 </html>

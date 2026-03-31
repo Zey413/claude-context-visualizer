@@ -238,15 +238,18 @@
 
   function renderTimeline() {
     const snapshots = state.timeline;
-    timelineCount.textContent = `${snapshots.length} / ${MAX_TIMELINE} snapshots`;
+    const snapshotsLabel = typeof I18n !== 'undefined' ? I18n.t('snapshots') : 'snapshots';
+    timelineCount.textContent = `${snapshots.length} / ${MAX_TIMELINE} ${snapshotsLabel}`;
 
     if (snapshots.length === 0) {
-      timelineChart.innerHTML = '<div class="timeline-empty">Adjust sliders to record snapshots</div>';
+      const emptyText = typeof I18n !== 'undefined' ? I18n.t('adjustSlidersToRecord') : 'Adjust sliders to record snapshots';
+      timelineChart.innerHTML = `<div class="timeline-empty">${emptyText}</div>`;
       return;
     }
 
     timelineChart.innerHTML = '';
 
+    const usedLabel = typeof I18n !== 'undefined' ? I18n.t('used') : 'used';
     snapshots.forEach((snap, i) => {
       const bar = document.createElement('div');
       bar.classList.add('timeline-bar');
@@ -278,7 +281,7 @@
       // Tooltip
       const tooltip = document.createElement('div');
       tooltip.classList.add('timeline-bar__tooltip');
-      tooltip.textContent = `${pct.toFixed(1)}% used`;
+      tooltip.textContent = `${pct.toFixed(1)}% ${usedLabel}`;
       bar.appendChild(tooltip);
 
       // Animate in with a stagger
@@ -298,6 +301,9 @@
   }
 
   function toggleCompareMode() {
+    // Update ARIA pressed state
+    compareToggle.setAttribute('aria-pressed', state.compareMode ? 'true' : 'false');
+
     if (state.compareMode) {
       compareToggle.classList.add('compare-btn--active');
       gaugeSection.classList.add('gauge-section--compare');
@@ -361,16 +367,23 @@
 
     // Update compare status
     const percent = compareModel.contextWindow > 0 ? (total / compareModel.contextWindow) * 100 : 0;
+
+    // Update compare gauge ARIA progressbar
+    const compareContainer = document.getElementById('gauge-container-compare');
+    if (compareContainer) {
+      compareContainer.setAttribute('aria-valuenow', Math.round(percent));
+    }
+
     const statusText = gaugeStatusCompare.querySelector('.gauge-status__text');
     gaugeStatusCompare.classList.remove('gauge-status--warning', 'gauge-status--danger');
     if (percent >= 90) {
       gaugeStatusCompare.classList.add('gauge-status--danger');
-      statusText.textContent = 'Critical';
+      statusText.textContent = typeof I18n !== 'undefined' ? I18n.t('statusCritical') : 'Critical';
     } else if (percent >= 70) {
       gaugeStatusCompare.classList.add('gauge-status--warning');
-      statusText.textContent = 'Warning';
+      statusText.textContent = typeof I18n !== 'undefined' ? I18n.t('statusWarning') : 'Warning';
     } else {
-      statusText.textContent = 'Normal';
+      statusText.textContent = typeof I18n !== 'undefined' ? I18n.t('statusNormal') : 'Normal';
     }
 
     updateModelLabels();
@@ -385,6 +398,12 @@
     // Update gauge
     gauge.update(state.tokens, model.contextWindow);
 
+    // Update primary gauge ARIA progressbar
+    const gaugeContainer = document.getElementById('gauge-container');
+    if (gaugeContainer) {
+      gaugeContainer.setAttribute('aria-valuenow', Math.round(percent));
+    }
+
     // Update particle system with current usage
     particles.setUsage(percent);
 
@@ -394,6 +413,11 @@
       const pct = model.contextWindow > 0 ? (state.tokens[cat] / model.contextWindow) * 100 : 0;
       barEls[cat].style.width = pct + '%';
       percentEls[cat].textContent = pct.toFixed(1) + '%';
+      // Update meter ARIA values
+      const meterEl = barEls[cat].parentElement;
+      if (meterEl && meterEl.hasAttribute('aria-valuenow')) {
+        meterEl.setAttribute('aria-valuenow', Math.round(pct));
+      }
     });
 
     // Stats bar
@@ -402,17 +426,17 @@
     statContextWindow.textContent = formatTokensShort(model.contextWindow);
     statOutputLimit.textContent = formatTokensShort(model.outputLimit);
 
-    // Status indicator
+    // Status indicator (with i18n)
     const statusText = gaugeStatus.querySelector('.gauge-status__text');
     gaugeStatus.classList.remove('gauge-status--warning', 'gauge-status--danger');
     if (percent >= 90) {
       gaugeStatus.classList.add('gauge-status--danger');
-      statusText.textContent = 'Critical';
+      statusText.textContent = typeof I18n !== 'undefined' ? I18n.t('statusCritical') : 'Critical';
     } else if (percent >= 70) {
       gaugeStatus.classList.add('gauge-status--warning');
-      statusText.textContent = 'Warning';
+      statusText.textContent = typeof I18n !== 'undefined' ? I18n.t('statusWarning') : 'Warning';
     } else {
-      statusText.textContent = 'Normal';
+      statusText.textContent = typeof I18n !== 'undefined' ? I18n.t('statusNormal') : 'Normal';
     }
 
     // Remaining color
@@ -503,6 +527,105 @@
     }
   }
 
+  // ---- Token Estimator ----
+  const ESTIMATOR_CHIPS = [
+    { label: '1 page of code',    tokens: 400,  category: 'user' },
+    { label: '1 system prompt',   tokens: 500,  category: 'system' },
+    { label: '1 long response',   tokens: 2000, category: 'assistant' },
+    { label: '1 tool schema',     tokens: 300,  category: 'tools' },
+    { label: '10 tool calls',     tokens: 3000, category: 'tools' },
+  ];
+
+  // CJK Unicode ranges (common blocks)
+  const CJK_REGEX = /[\u2E80-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\u{20000}-\u{2FA1F}]/u;
+
+  function estimateTokens(text) {
+    if (!text) return 0;
+    let tokens = 0;
+    let nonCjkBuffer = '';
+    for (const ch of text) {
+      if (CJK_REGEX.test(ch)) {
+        // Flush non-CJK buffer first
+        if (nonCjkBuffer) {
+          const words = nonCjkBuffer.split(/\s+/).filter(Boolean);
+          tokens += words.length * 1.3;
+          nonCjkBuffer = '';
+        }
+        tokens += 0.4;  // CJK: ~0.4 tokens per character
+      } else {
+        nonCjkBuffer += ch;
+      }
+    }
+    // Flush remaining non-CJK
+    if (nonCjkBuffer) {
+      const words = nonCjkBuffer.split(/\s+/).filter(Boolean);
+      tokens += words.length * 1.3;
+    }
+    return Math.round(tokens);
+  }
+
+  function addTokensToCategory(category, amount) {
+    const model = CLAUDE_MODELS[state.modelIndex];
+    const currentTotal = categories.reduce((s, c) => s + state.tokens[c], 0);
+    const available = model.contextWindow - currentTotal;
+    const clamped = Math.max(0, Math.min(amount, available));
+    state.tokens[category] += clamped;
+    state.activePreset = null;
+    syncSlidersFromState();
+    pushTimelineSnapshot();
+    render();
+    save();
+  }
+
+  function initEstimator() {
+    const toggle = document.getElementById('estimator-toggle');
+    const card = document.getElementById('estimator-card');
+    const textarea = document.getElementById('estimator-textarea');
+    const countEl = document.getElementById('estimator-count');
+    const addBtn = document.getElementById('estimator-add-btn');
+    const addTarget = document.getElementById('estimator-add-target');
+    const chipsContainer = document.getElementById('estimator-chips');
+
+    if (!toggle || !card) return;
+
+    // Collapsible toggle
+    toggle.addEventListener('click', () => {
+      const isOpen = card.classList.toggle('estimator-card--open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    // Live token estimation from textarea
+    let _estimateDebounce = null;
+    textarea.addEventListener('input', () => {
+      clearTimeout(_estimateDebounce);
+      _estimateDebounce = setTimeout(() => {
+        const count = estimateTokens(textarea.value);
+        countEl.textContent = formatNumber(count);
+      }, 150);
+    });
+
+    // Add estimated tokens button
+    addBtn.addEventListener('click', () => {
+      const count = estimateTokens(textarea.value);
+      if (count > 0) {
+        addTokensToCategory(addTarget.value, count);
+      }
+    });
+
+    // Build quick-estimate chips
+    ESTIMATOR_CHIPS.forEach(chip => {
+      const btn = document.createElement('button');
+      btn.classList.add('estimator-chip');
+      btn.innerHTML = `${chip.label} <span class="estimator-chip__tokens">(~${formatNumber(chip.tokens)})</span>`;
+      btn.title = `Add ~${formatNumber(chip.tokens)} tokens to ${chip.category}`;
+      btn.setAttribute('aria-label', `${chip.label}: add approximately ${formatNumber(chip.tokens)} tokens to ${chip.category}`);
+      btn.addEventListener('click', () => {
+        addTokensToCategory(chip.category, chip.tokens);
+      });
+      chipsContainer.appendChild(btn);
+    });
+  }
+
   // ---- Boot ----
   function init() {
     initModelSelect();
@@ -510,6 +633,7 @@
     initSliders();
     initKeyboard();
     initCompareMode();
+    initEstimator();
     initTheme();
     initLangSelector();
     initShareButtons();
@@ -546,28 +670,29 @@
   // ---- Theme Toggle ----
   function initTheme() {
     const btn = document.getElementById('theme-toggle');
-    const darkIcon = btn.querySelector('.theme-icon--dark');
-    const lightIcon = btn.querySelector('.theme-icon--light');
+    if (!btn) return;
+    const moonIcon = btn.querySelector('.icon-moon');
+    const sunIcon = btn.querySelector('.icon-sun');
 
     // Load saved theme
     const saved = localStorage.getItem('claude-ctx-theme');
     if (saved === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
-      darkIcon.style.display = 'none';
-      lightIcon.style.display = 'block';
+      if (moonIcon) moonIcon.style.display = 'none';
+      if (sunIcon) sunIcon.style.display = 'block';
     }
 
     btn.addEventListener('click', () => {
       const isLight = document.documentElement.getAttribute('data-theme') === 'light';
       if (isLight) {
         document.documentElement.removeAttribute('data-theme');
-        darkIcon.style.display = 'block';
-        lightIcon.style.display = 'none';
+        if (moonIcon) moonIcon.style.display = 'block';
+        if (sunIcon) sunIcon.style.display = 'none';
         localStorage.setItem('claude-ctx-theme', 'dark');
       } else {
         document.documentElement.setAttribute('data-theme', 'light');
-        darkIcon.style.display = 'none';
-        lightIcon.style.display = 'block';
+        if (moonIcon) moonIcon.style.display = 'none';
+        if (sunIcon) sunIcon.style.display = 'block';
         localStorage.setItem('claude-ctx-theme', 'light');
       }
     });
@@ -575,12 +700,17 @@
 
   // ---- Language Selector ----
   function initLangSelector() {
-    const langSelect = document.getElementById('lang-select');
-    if (!langSelect || typeof I18N === 'undefined') return;
+    if (typeof I18n === 'undefined') return;
 
-    langSelect.value = I18n.currentLang;
+    // Initialize i18n (detects browser language or loads saved preference)
+    I18n.init();
+
+    const langSelect = document.getElementById('lang-select');
+    if (!langSelect) return;
+
+    langSelect.value = I18n.getLanguage();
     langSelect.addEventListener('change', () => {
-      I18n.setLang(langSelect.value);
+      I18n.setLanguage(langSelect.value);
     });
   }
 
