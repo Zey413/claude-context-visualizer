@@ -1248,6 +1248,23 @@
     if (typeof ConfigExporter !== 'undefined' && ConfigExporter.isInited && ConfigExporter.isInited()) {
       ConfigExporter.setData(state.tokens, state.modelIndex);
     }
+
+    // ---- v4.0: Update new visualization modules ----
+    if (typeof LiveMetrics !== 'undefined' && LiveMetrics.isInited && LiveMetrics.isInited()) {
+      LiveMetrics.update(state.tokens, state.modelIndex, CLAUDE_MODELS[state.modelIndex].contextWindow);
+    }
+    if (typeof ContextScore !== 'undefined' && ContextScore.isInited && ContextScore.isInited()) {
+      ContextScore.update(state.tokens, state.modelIndex, CLAUDE_MODELS[state.modelIndex].contextWindow);
+    }
+    if (typeof ContextPressure !== 'undefined' && ContextPressure.isInited && ContextPressure.isInited()) {
+      ContextPressure.update(state.tokens, CLAUDE_MODELS[state.modelIndex].contextWindow);
+    }
+    if (typeof ContextTimeline !== 'undefined' && ContextTimeline.isInited && ContextTimeline.isInited()) {
+      ContextTimeline.update(state.tokens, CLAUDE_MODELS[state.modelIndex].contextWindow);
+    }
+    if (typeof ContextRing !== 'undefined' && ContextRing.isInited && ContextRing.isInited()) {
+      ContextRing.update(state.tokens, CLAUDE_MODELS[state.modelIndex].contextWindow);
+    }
   }
 
   // ---- Keyboard Shortcuts ----
@@ -3026,6 +3043,28 @@
     // ---- v3.4: Initialize Keyboard Help ----
     if (typeof KeyboardHelp !== 'undefined') {
       // KeyboardHelp auto-binds ? key — no container needed
+    }
+
+    // ---- v4.0: Initialize new visualization modules ----
+    initNewModuleToggle('live-metrics');
+    if (typeof LiveMetrics !== 'undefined') {
+      LiveMetrics.init('live-metrics-container');
+    }
+    initNewModuleToggle('context-score');
+    if (typeof ContextScore !== 'undefined') {
+      ContextScore.init('context-score-container');
+    }
+    initNewModuleToggle('context-pressure');
+    if (typeof ContextPressure !== 'undefined') {
+      ContextPressure.init('context-pressure-container');
+    }
+    initNewModuleToggle('context-timeline');
+    if (typeof ContextTimeline !== 'undefined') {
+      ContextTimeline.init('context-timeline-container');
+    }
+    initNewModuleToggle('context-ring');
+    if (typeof ContextRing !== 'undefined') {
+      ContextRing.init('context-ring-container');
     }
   }
 

@@ -1098,6 +1098,96 @@
       </div>
     </section>
 
+    <!-- ====== NEW v4.0: Live Metrics Dashboard ====== -->
+    <section class="live-metrics-section glass-card scroll-reveal" id="live-metrics-section">
+      <button class="estimator-toggle" id="live-metrics-toggle" aria-expanded="false" aria-controls="live-metrics-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">📊</span>
+          <h3 class="estimator-toggle__title">Live Metrics Dashboard</h3>
+          <span class="badge badge--new">v4</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="live-metrics-body" id="live-metrics-body" style="display:none;">
+        <p class="section-desc">Real-time metrics with animated counters, sparklines, and trend indicators. Track tokens/sec, cost, health score, and estimated turns remaining.</p>
+        <div id="live-metrics-container"></div>
+      </div>
+    </section>
+
+    <!-- ====== NEW v4.0: Context Efficiency Score ====== -->
+    <section class="context-score-section glass-card scroll-reveal" id="context-score-section">
+      <button class="estimator-toggle" id="context-score-toggle" aria-expanded="false" aria-controls="context-score-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">🏆</span>
+          <h3 class="estimator-toggle__title">Context Efficiency Score</h3>
+          <span class="badge badge--new">v4</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="context-score-body" id="context-score-body" style="display:none;">
+        <p class="section-desc">Gamified scoring system for context usage efficiency. Get a letter grade (S/A/B/C/D/F) based on 5 factors with optimization tips.</p>
+        <div id="context-score-container"></div>
+      </div>
+    </section>
+
+    <!-- ====== NEW v4.0: Context Pressure Gauge ====== -->
+    <section class="context-pressure-section glass-card scroll-reveal" id="context-pressure-section">
+      <button class="estimator-toggle" id="context-pressure-toggle" aria-expanded="false" aria-controls="context-pressure-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">🌡️</span>
+          <h3 class="estimator-toggle__title">Context Pressure Gauge</h3>
+          <span class="badge badge--new">v4</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="context-pressure-body" id="context-pressure-body" style="display:none;">
+        <p class="section-desc">Visualize context usage as pressure building in a vessel. Animated fluid fill with rising bubbles and a PSI dial. Warning klaxon at critical levels.</p>
+        <div id="context-pressure-container"></div>
+      </div>
+    </section>
+
+    <!-- ====== NEW v4.0: Context Timeline Heatmap ====== -->
+    <section class="context-timeline-section glass-card scroll-reveal" id="context-timeline-section">
+      <button class="estimator-toggle" id="context-timeline-toggle" aria-expanded="false" aria-controls="context-timeline-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">📅</span>
+          <h3 class="estimator-toggle__title">Context Timeline Heatmap</h3>
+          <span class="badge badge--new">v4</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="context-timeline-body" id="context-timeline-body" style="display:none;">
+        <p class="section-desc">GitHub-contributions-style heatmap showing context usage intensity per conversation turn. Hover for detailed per-turn breakdowns.</p>
+        <div id="context-timeline-container"></div>
+      </div>
+    </section>
+
+    <!-- ====== NEW v4.0: Context Window 3D Ring ====== -->
+    <section class="context-ring-section glass-card scroll-reveal" id="context-ring-section">
+      <button class="estimator-toggle" id="context-ring-toggle" aria-expanded="false" aria-controls="context-ring-body">
+        <div class="estimator-toggle__left">
+          <span class="estimator-toggle__icon" aria-hidden="true">💎</span>
+          <h3 class="estimator-toggle__title">3D Context Ring</h3>
+          <span class="badge badge--new">v4</span>
+        </div>
+        <svg class="estimator-toggle__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="context-ring-body" id="context-ring-body" style="display:none;">
+        <p class="section-desc">Interactive pseudo-3D ring visualization with CSS transforms. Drag to rotate, segments rise proportionally to token usage.</p>
+        <div id="context-ring-container"></div>
+      </div>
+    </section>
+
     <!-- Conversation Replay -->
     <section class="replay-card glass-card" id="replay-card">
       <button class="estimator-toggle" id="replay-toggle" aria-expanded="false" aria-controls="replay-body">
@@ -1171,7 +1261,7 @@
           <option value="ja">日本語</option>
         </select>
       </div>
-      <p>Built with ✨ by <a href="https://github.com/Zey413" target="_blank" rel="noopener">@Zey413</a> <span class="footer__version">v3.4.0</span></p>
+      <p>Built with ✨ by <a href="https://github.com/Zey413" target="_blank" rel="noopener">@Zey413</a> <span class="footer__version">v4.0.0</span></p>
       <p class="footer__hint">Keyboard: <kbd>R</kbd> Reset &middot; <kbd>1</kbd>-<kbd>4</kbd> Presets &middot; <kbd>C</kbd> Compare &middot; <kbd>D</kbd> Dashboard &middot; <kbd>T</kbd> Theme &middot; <kbd>?</kbd> Help</p>
     </footer>
   </div>
@@ -1204,6 +1294,12 @@
   <script src="js/template-builder.js" defer></script>
   <script src="js/keyboard-help.js" defer></script>
   <script src="js/token-calculator.js" defer></script>
+  <!-- v4.0 modules -->
+  <script src="js/live-metrics.js" defer></script>
+  <script src="js/context-score.js" defer></script>
+  <script src="js/context-pressure.js" defer></script>
+  <script src="js/context-timeline.js" defer></script>
+  <script src="js/context-ring.js" defer></script>
   <script src="js/app.js" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
